@@ -1,0 +1,28 @@
+{
+    "definitions": {
+        "user": {
+            "id": "/user",
+            "type": "object",
+            "properties": {
+                "username": { "type": "string", "minLength": 3 },
+                "email": { "type": "string", "format": "email" },
+                "password": { "type": "string", "minLength": 8 },
+                "role": { "type": "string", "enum": ["user", "admin", "agent"] },
+                "firstName": { "type": "string" },
+                "lastName": { "type": "string" }
+            },
+            "required": ["username", "email", "password"],
+            "additionalProperties": false
+        },
+        "userUpdate": {
+            "type": "object",
+            "properties": {
+                "firstName": { "type": "string" },
+                "lastName": { "type": "string" },
+                "password": { "type": "string", "minLength": 8 },
+                "email": { "type": "string", "format": "email" }
+            },
+            "additionalProperties": false
+        }
+    }
+}
