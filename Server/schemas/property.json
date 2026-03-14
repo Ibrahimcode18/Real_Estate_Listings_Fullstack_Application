@@ -6,11 +6,11 @@
             "properties": {
                 "agent_id": {"type": "integer"},
                 "location_id": {"type": "integer"},
-                "title": {"type": "string"},
+                "title": {"type": "string", "maxLength": 62},
                 "description": {"type": "string"},
                 "price": {"type": "number"},
                 "listing_type": {"type": "string", "enum": ["sale", "rent"]},
-                "image_url": {"type": "string", "format": "uri"}
+                "image_url": {"type": "string", "format": "uri", "maxLength": 125}
             },
             "required": ["agent_id", "location_id", "title", "description", "price", "listing_type"],
             "additionalProperties": false
