@@ -27,3 +27,10 @@ exports.add = async function add (user) {
     const data = await db.run_query(query, [user]);
     return data;
 }
+
+// Get all users (used for administrative listing)
+exports.getAll = async function getAll() {
+    const query = "SELECT * FROM users;";
+    const data = await db.run_query(query);
+    return data;
+}
