@@ -1,6 +1,9 @@
 const { Validator, ValidationError } = require('jsonschema');
+
 const userSchema = require('../schemas/user.json').definitions.user;
 const userUpdateSchema = require('../schemas/user.json').definitions.userUpdate;
+const propertySchema = require('../schemas/property.json').definitions.property;
+const propertyUpdateSchema = require('../schemas/property.json').definitions.propertyUpdate;
 
 // A Factory function: It creates a custom checker function for a specific schema
 const makeKoaValidator = (schema, resource) => {
@@ -31,3 +34,5 @@ const makeKoaValidator = (schema, resource) => {
 
 exports.validateUser = makeKoaValidator(userSchema, 'user');
 exports.validateUserUpdate = makeKoaValidator(userUpdateSchema, 'userUpdate');
+exports.validateProperty = makeKoaValidator(propertySchema, 'property');
+exports.validatePropertyUpdate = makeKoaValidator(propertyUpdateSchema, 'propertyUpdate');
