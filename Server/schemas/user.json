@@ -4,12 +4,12 @@
             "id": "/user",
             "type": "object",
             "properties": {
-                "username": { "type": "string", "minLength": 3 },
-                "email": { "type": "string", "format": "email" },
-                "password": { "type": "string", "minLength": 8 },
+                "username": { "type": "string", "minLength": 3, "maxLength": 15, "pattern": "^[A-Za-z0-9]+$" },
+                "email": { "type": "string", "format": "email", "maxLength": 64 },
+                "password": { "type": "string", "minLength": 8, "maxLength": 15 },
                 "role": { "type": "string", "enum": ["user", "admin", "agent"] },
-                "firstName": { "type": "string" },
-                "lastName": { "type": "string" }
+                "firstName": { "type": "string", "maxLength": 32 },
+                "lastName": { "type": "string", "maxLength": 32 }
             },
             "required": ["username", "email", "password"],
             "additionalProperties": false
@@ -17,10 +17,10 @@
         "userUpdate": {
             "type": "object",
             "properties": {
-                "firstName": { "type": "string" },
-                "lastName": { "type": "string" },
-                "password": { "type": "string", "minLength": 8 },
-                "email": { "type": "string", "format": "email" }
+                "firstName": { "type": "string", "maxLength": 32 },
+                "lastName": { "type": "string", "maxLength": 32 },
+                "password": { "type": "string", "minLength": 8, "maxLength": 15 },
+                "email": { "type": "string", "format": "email", "maxLength": 64 }
             },
             "additionalProperties": false
         }
