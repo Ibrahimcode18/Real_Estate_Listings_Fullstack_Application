@@ -12,8 +12,12 @@
   "type": "commonjs",
   "dependencies": {
     "@koa/cors": "^5.0.0",
+    "bcrypt": "^6.0.0",
+    "jsonschema": "^1.5.0",
     "koa": "^3.1.2",
     "koa-bodyparser": "^4.4.1",
-    "koa-router": "^14.0.0"
+    "koa-router": "^14.0.0",
+    "mysql2": "^3.19.0",
+    "uuid": "^13.0.0"
   }
 }
