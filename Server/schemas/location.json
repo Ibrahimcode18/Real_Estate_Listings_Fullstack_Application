@@ -1,0 +1,15 @@
+{
+    "definitions": {
+        "location": {
+            "id": "/location",
+            "type": "object",
+            "properties": {
+                "city": {"type": "string", "maxLength": 64},
+                "image_url": {"type": "string", "format": "uri", "maxLength": 125}
+            },
+            "required": ["city", "image_url"],
+            "additionalProperties": false
+        }
+    }
+               
+}
