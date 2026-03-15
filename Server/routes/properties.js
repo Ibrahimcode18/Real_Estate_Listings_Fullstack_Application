@@ -14,6 +14,7 @@ router.get('/', getAll);
 router.get('/:id', getById)
 router.post('/', bodyParser(), validateProperty, createProperty);
 router.put('/:id', bodyParser(), validatePropertyUpdate, updateProperty);
+router.delete('/:id', deleteProperty);
 
 // Handlers
 async function getAll(ctx) {
@@ -82,5 +83,23 @@ async function updateProperty(ctx) {
         ctx.body = { message: "An error occurred while updating the property." };
     }
 }
+
+async function deleteProperty(ctx) {
+    const id = parseInt(ctx.params.id);
+    try {
+        const result = await model.deleteById(id);
+        if (result.affectedRows) {
+            ctx.status = 200;
+            ctx.body = { message: "Property deleted successfully." };
+        } else {
+            ctx.status = 404;
+            ctx.body = { message: "Property not found." };
+        }
+    } catch (err) {
+        ctx.status = 500;
+        ctx.body = { message: "An error occurred while deleting the property." };
+    }
+}
+
 
 module.exports = router;
