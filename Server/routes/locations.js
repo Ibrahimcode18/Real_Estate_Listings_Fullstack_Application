@@ -8,6 +8,7 @@ const { validateLocation } = require('../controllers/validation');
 // Routes
 router.get('/', getAll);
 router.post('/', bodyParser(), validateLocation,   createLocation);
+router.get('/:id/properties', getPropertiesById);
 // Add delete location.
 
 // Handlers
@@ -26,6 +27,17 @@ async function createLocation(ctx) {
     } catch (err) {
         ctx.status = 500;
         ctx.body = { message: "An error occurred while creating the location." };
+    }
+}
+
+async function getPropertiesById(ctx) {
+    const id = parseInt(ctx.params.id);
+    const data = await model.getPropertiesById(id);
+    if (data.length) {
+        ctx.body = data;
+    } else {
+        ctx.status = 404;
+        ctx.body = { message: "No properties found for this location." };
     }
 }
 

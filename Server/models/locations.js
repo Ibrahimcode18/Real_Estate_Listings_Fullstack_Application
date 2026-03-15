@@ -1,7 +1,7 @@
 const db = require('../helpers/database'); 
 
-exports.findLocationById = async function findLocationById (id) {
-    const query = "SELECT * FROM locations WHERE ID = ?;";
+exports.getPropertiesById = async function getPropertiesById(id) {
+    const query = "SELECT * FROM properties WHERE location_id = ?;";
     const data = await db.run_query(query, [id]);
     return data;
 }
