@@ -16,7 +16,6 @@ router.get('/', getAll);
 router.get('/:id', getById);
 router.put('/:id', bodyParser(), validateUserUpdate, updateUser);
 router.post('/login', loginUser);
-// Add more routes like PUT /:id for updates, etc. as needed
 
 async function createUser(ctx) {
     const body = ctx.request.body;
