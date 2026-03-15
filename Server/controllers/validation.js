@@ -5,6 +5,8 @@ const userUpdateSchema = require('../schemas/user.json').definitions.userUpdate;
 const propertySchema = require('../schemas/property.json').definitions.property;
 const propertyUpdateSchema = require('../schemas/property.json').definitions.propertyUpdate;
 const locationSchema = require('../schemas/location.json').definitions.location;
+const agentSchema = require('../schemas/agent.json').definitions.agent;
+const agentUpdateSchema = require('../schemas/agent.json').definitions.agentUpdate;
 
 // A Factory function: It creates a custom checker function for a specific schema
 const makeKoaValidator = (schema, resource) => {
@@ -38,3 +40,5 @@ exports.validateUserUpdate = makeKoaValidator(userUpdateSchema, 'userUpdate');
 exports.validateProperty = makeKoaValidator(propertySchema, 'property');
 exports.validatePropertyUpdate = makeKoaValidator(propertyUpdateSchema, 'propertyUpdate');
 exports.validateLocation = makeKoaValidator(locationSchema, 'location');
+exports.validateAgent = makeKoaValidator(agentSchema, 'agent');
+exports.validateAgentUpdate = makeKoaValidator(agentUpdateSchema, 'agentUpdate');

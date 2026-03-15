@@ -1,0 +1,29 @@
+{
+    "definitions": {
+        "agent": {
+            "id": "/agent",
+            "type": "object",
+            "properties": {
+                "user_id": {"type": "integer", "minimum": 1},
+                "agency_name": {"type": "string", "minLength": 2, "maxLength": 16},
+                "phone_number": {"type": "string", "minLength": 10, "maxLength": 20},
+                "license_number": {"type": "string", "minLength": 7, "maxLength": 32},
+                "about": {"type": "string", "maxLength": 128}
+            },
+            "required": ["user_id", "agency_name", "phone_number", "license_number"],
+            "additionalProperties": false
+        },
+        "agentUpdate": {
+            "id": "/agentUpdate",
+            "type": "object",
+            "properties": {
+                "agency_name": {"type": "string", "minLength": 2, "maxLength": 16},
+                "phone_number": {"type": "string", "minLength": 10, "maxLength": 20},
+                "license_number": {"type": "string", "minLength": 7, "maxLength": 32},
+                "about": {"type": "string", "maxLength": 128}
+            },
+            "additionalProperties": false
+        }
+            
+    }
+}
