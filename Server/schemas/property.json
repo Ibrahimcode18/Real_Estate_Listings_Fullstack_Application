@@ -19,11 +19,11 @@
             "type": "object",
             "properties": {
                 "location_id": {"type": "integer"},
-                "title": {"type": "string", "maxLength": 62},
-                "description": {"type": "string"},
+                "title": {"type": "string", "maxLength": 62, "minLength": 1},
+                "description": {"type": "string", "minLength": 1},
                 "price": {"type": "number"},
                 "listing_type": {"type": "string", "enum": ["sale", "rent"]},
-                "image_url": {"type": "string", "format": "uri", "maxLength": 125}
+                "image_url": {"type": "string", "format": "uri", "maxLength": 125, "minLength": 1}
             },
             "additionalProperties": false
         }
