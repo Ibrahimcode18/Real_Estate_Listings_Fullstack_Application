@@ -1,11 +1,12 @@
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
+
 const model = require('../models/users');
-const { validateUser } = require('../controllers/validation'); // Import our checker
+const { validateUser, validateUserUpdate } = require('../controllers/validation'); // Import our checker
 const prefix = '/api/v1/users';
 const router = new Router({ prefix: prefix });
 const bcrypt = require('bcrypt');
-// const { validateUserUpdate } = require('../controllers/validation');
+
 
 // Routes
 // We insert 'validateUser' BEFORE 'createUser'
@@ -13,7 +14,7 @@ const bcrypt = require('bcrypt');
 router.post('/', bodyParser(), validateUser, createUser);
 router.get('/', getAll);
 router.get('/:id', getById);
-// router.put('/:id', bodyParser(), validateUserUpdate, updateUser);
+router.put('/:id', bodyParser(), validateUserUpdate, updateUser);
 router.post('/login', loginUser);
 // Add more routes like PUT /:id for updates, etc. as needed
 
@@ -57,6 +58,9 @@ async function getById(ctx) { // Anybody can access this for now, but we will ad
         // IMPORTANT: Never send the password back, even the hash!
         delete user.password;
         ctx.body = user;
+    } else {
+        ctx.status = 404;
+        ctx.body = { message: "User not found" };
     }
 }
 
@@ -103,6 +107,31 @@ async function loginUser(ctx) {
         ctx.body = { message: "Invalid username or password" };
     }
 }
+
+async function updateUser(ctx) {
+    const id = ctx.params.id;
+    const body = ctx.request.body;
+    const fieldsToUpdate = ctx.request.body;
+
+    if (body.password) {
+        fieldsToUpdate.password = bcrypt.hashSync(body.password, 10);
+    }
+    try {
+        const result = await model.updateById(id, fieldsToUpdate);
+        if (result.affectedRows) {
+            ctx.status = 200;
+            ctx.body = { message: "User updated successfully." };
+        } else {
+            ctx.status = 404;
+            ctx.body = { message: "User not found." };
+        }
+    } catch (err) {
+        ctx.status = 500;
+        ctx.body = { message: "An error occurred while updating the user." };
+    }  
+}
+
+
 
 // async function updateUser(ctx) {
 //     const id = ctx.params.id;

@@ -34,3 +34,10 @@ exports.getAll = async function getAll() {
     const data = await db.run_query(query);
     return data;
 }
+
+
+exports.updateById = async function updateById(id, fieldsToUpdate) {
+    const query = "UPDATE users SET ? WHERE ID = ?;";
+    const data = await db.run_query(query, [fieldsToUpdate, id]);
+    return data;
+}
