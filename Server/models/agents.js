@@ -12,6 +12,12 @@ exports.getAll = async function getAll () {
     return data;
 }
 
+exports.getPropertiesById = async function getPropertiesById (agentId) {
+    const query = "SELECT * FROM properties WHERE agent_id = ?;";
+    const data = await db.run_query(query, [agentId]);
+    return data;
+}
+
 exports.add = async function add (agent) {
     const query = "INSERT INTO agents (user_id, agency_name, phone_number, license_number, about, is_approved) VALUES (?, ?, ?, ?, ?, ?);";
     const data = await db.run_query(query, [agent.user_id, agent.agency_name, agent.phone_number, agent.license_number, agent.about, agent.is_approved]);

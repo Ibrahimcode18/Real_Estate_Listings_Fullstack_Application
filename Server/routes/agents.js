@@ -10,6 +10,7 @@ const router = new Router({ prefix: prefix });
 router.post('/', bodyParser(), validateAgent, createAgent);
 router.get('/', getAll);
 router.get('/:id', getById);
+router.get('/:id/properties', getPropertiesById);
 router.put('/:id', bodyParser(), validateAgentUpdate, updateAgent);
 
 
@@ -47,6 +48,16 @@ async function getById(ctx) {
     }
 }
 
+async function getPropertiesById(ctx) {
+    const agentId = ctx.params.id;
+    const results = await model.getPropertiesById(agentId);
+    if (results.length) {
+        ctx.body = results;
+    } else {
+        ctx.status = 404;
+        ctx.body = { message: "No properties found for this agent." };
+    }
+}
 
 async function updateAgent(ctx) {
     const id = ctx.params.id;
