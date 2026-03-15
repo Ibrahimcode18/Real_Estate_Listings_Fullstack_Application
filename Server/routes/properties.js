@@ -7,12 +7,13 @@ const agentModel = require('../models/agents');
 
 const router = new Router({ prefix: '/api/v1/properties' }); // Prefix means all routes here start with /api/v1/properties
 
-const { validateProperty } = require('../controllers/validation');
+const { validateProperty, validatePropertyUpdate } = require('../controllers/validation');
 
 // Routes
 router.get('/', getAll);
 router.get('/:id', getById)
 router.post('/', bodyParser(), validateProperty, createProperty);
+router.put('/:id', bodyParser(), validatePropertyUpdate, updateProperty);
 
 // Handlers
 async function getAll(ctx) {
@@ -56,5 +57,30 @@ async function getById(ctx){
     }
 }
 
+async function updateProperty(ctx) {
+    const id = parseInt(ctx.params.id);
+    
+    const isLocationIdValid = await locationModel.findLocationById(ctx.request.body.location_id);
+    if (ctx.request.body.location_id && !isLocationIdValid.length) { // If the locationId doesn't exist in the locations table, it is considered a bad request.
+        ctx.status = 400;
+        ctx.body = { message: "Invalid locationId. No such location exists." };
+        return;
+    }
+
+    const fieldsToUpdate = ctx.request.body;
+    try {
+        const result = await model.updateById(id, fieldsToUpdate);
+        if (result.affectedRows) {
+            ctx.status = 200;
+            ctx.body = { message: "Property updated successfully." };
+        } else {
+            ctx.status = 404;
+            ctx.body = { message: "Property not found." };
+        }
+    } catch (err) {
+        ctx.status = 500;
+        ctx.body = { message: "An error occurred while updating the property." };
+    }
+}
 
 module.exports = router;

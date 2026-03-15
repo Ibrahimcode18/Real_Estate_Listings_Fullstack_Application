@@ -24,14 +24,14 @@ exports.add = async function add (property) {
 //     return data;
 // }
 
-// exports.updateById = async function updateById (id, fieldsToUpdate) {
-//     const setClause = Object.keys(fieldsToUpdate).map(key => `${key} = ?`).join(', ');
-//     const values = Object.values(fieldsToUpdate);
-//     values.push(id);
-//     const query = `UPDATE properties SET ${setClause} WHERE ID = ?;`;
-//     const data = await db.run_query(query, values);
-//     return data;
-// }
+exports.updateById = async function updateById (id, fieldsToUpdate) {
+    const setClause = Object.keys(fieldsToUpdate).map(key => `${key} = ?`).join(', ');
+    const values = Object.values(fieldsToUpdate);
+    values.push(id);
+    const query = `UPDATE properties SET ${setClause} WHERE ID = ?;`;
+    const data = await db.run_query(query, values);
+    return data;
+}
 
 
 // exports.search = async function search (searchTerm, page, limit) {
