@@ -37,8 +37,11 @@ const makeKoaValidator = (schema, resource) => {
 
 exports.validateUser = makeKoaValidator(userSchema, 'user');
 exports.validateUserUpdate = makeKoaValidator(userUpdateSchema, 'userUpdate');
+
 exports.validateProperty = makeKoaValidator(propertySchema, 'property');
 exports.validatePropertyUpdate = makeKoaValidator(propertyUpdateSchema, 'propertyUpdate');
+
 exports.validateLocation = makeKoaValidator(locationSchema, 'location');
+
 exports.validateAgent = makeKoaValidator(agentSchema, 'agent');
 exports.validateAgentUpdate = makeKoaValidator(agentUpdateSchema, 'agentUpdate');
