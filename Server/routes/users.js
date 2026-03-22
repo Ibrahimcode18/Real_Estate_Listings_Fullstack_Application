@@ -7,7 +7,8 @@ const prefix = '/api/v1/users';
 const router = new Router({ prefix: prefix });
 const bcrypt = require('bcrypt');
 
-
+const auth = require('../controllers/auth');
+const jwt = require('jsonwebtoken');
 // Routes
 // We insert 'validateUser' BEFORE 'createUser'
 // If validation fails, createUser never runs.
@@ -15,7 +16,7 @@ router.post('/', bodyParser(), validateUser, createUser);
 router.get('/', getAll);
 router.get('/:id', getById);
 router.put('/:id', bodyParser(), validateUserUpdate, updateUser);
-router.post('/login', loginUser);
+router.post('/login', auth.requireBasic, loginUser);
 
 async function createUser(ctx) {
     const body = ctx.request.body;
@@ -64,48 +65,24 @@ async function getById(ctx) { // Anybody can access this for now, but we will ad
 }
 
 async function loginUser(ctx) {
-    const authHeader = ctx.request.headers.authorization;   // Grab the Authorization header
-
-    if (!authHeader || !authHeader.startsWith('Basic ')) {
-        ctx.status = 401;
-        ctx.body = { message: "Missing or invalid authorization header" };
-        return;
-    }
-
-    // 2. Decode the Base64 string back into "username:password"
-    const base64 = authHeader.split(' ')[1];
-    const plainText = Buffer.from(base64, 'base64').toString('utf-8');
-    const separatorIndex = plainText.indexOf(':');
-    if (separatorIndex === -1) {
-        ctx.status = 400;
-        ctx.body = { message: "Invalid authorization payload format" };
-        return;
-    }
-
-    const username = plainText.substring(0, separatorIndex);
-    const password = plainText.substring(separatorIndex + 1);
-    
-    // 3. Look up the user in the database
-    const result = await model.findByUsername(username);
-    if (result.length === 0) {
-        ctx.status = 401; // Unauthorized
-        ctx.body = { message: "Invalid username or password" };
-        return;
-    }
-    const user = result[0];
-    // 4. Use Bcrypt to compare the typed password with the stored hash
-    const isValid = bcrypt.compareSync(password, user.password);
-    if (isValid) {
-    // 5. Success! Strip out the password before sending the profile back
-        delete user.password;
-
-        ctx.status = 200;
-        ctx.body = user; // Send the user data back to Pinia!
-    } else {
-        ctx.status = 401; // Unauthorized
-        ctx.body = { message: "Invalid username or password" };
-    }
+    // Because the requireBasic guard passed, ctx.state.user is already populated!
+    const user = ctx.state.user;
+    // Define the payload (claims) we want to embed in the token
+    const payload = {
+        ID: user.ID,
+        username: user.username,
+        role: user.role
+    };
+    // Sign the token (Must match the secret in strategies/jwt.js)
+    const token = jwt.sign(payload, 'my_super_secure_secret_key_123', { expiresIn: '1h' });
+    ctx.status = 200;
+    ctx.body = {
+        message: "Login successful",
+        token: token,
+        user: payload
+    };
 }
+
 
 async function updateUser(ctx) {
     const id = ctx.params.id;
@@ -132,14 +109,6 @@ async function updateUser(ctx) {
 
 
 
-// async function updateUser(ctx) {
-//     const id = ctx.params.id;
-//     const body = ctx.request.body;
-//     // We will only allow updates to firstName, lastName, email, and password
-//     const fieldsToUpdate = {};
-//     if (body.firstName) fieldsToUpdate.firstName = body.firstName;
-//     if (body.lastName) fieldsToUpdate.lastName = body.lastName;
-//     if (body.email) fieldsToUpdate.email = body.email;
-//     if (body.password) fieldsToUpdate.password = bcrypt.hashSync(body.password, 10);
+
 
 module.exports = router;

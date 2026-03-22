@@ -1,20 +1,23 @@
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 
+const auth = require('../controllers/auth');
+
 const model = require('../models/properties');
 const locationModel = require('../models/locations');
-const agentModel = require('../models/agents'); 
+const agentModel = require('../models/agents');
 
-const router = new Router({ prefix: '/api/v1/properties' }); // Prefix means all routes here start with /api/v1/properties
+const prefix = '/api/v1/properties'
+const router = new Router({ prefix: prefix }); // Prefix means all routes here start with /api/v1/properties
 
 const { validateProperty, validatePropertyUpdate } = require('../controllers/validation');
 
 // Routes
 router.get('/', getAll);
 router.get('/:id', getById)
-router.post('/', bodyParser(), validateProperty, createProperty);
-router.put('/:id', bodyParser(), validatePropertyUpdate, updateProperty);
-router.delete('/:id', deleteProperty);
+router.post('/', auth.requireJWT, bodyParser(), validateProperty, createProperty);
+router.put('/:id', auth.requireJWT, bodyParser(), validatePropertyUpdate, updateProperty);
+router.delete('/:id', auth.requireJWT, deleteProperty);
 
 // Handlers
 async function getAll(ctx) {
