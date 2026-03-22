@@ -14,12 +14,14 @@
     "@koa/cors": "^5.0.0",
     "bcrypt": "^6.0.0",
     "jsonschema": "^1.5.0",
+    "jsonwebtoken": "^9.0.3",
     "koa": "^3.1.2",
     "koa-bodyparser": "^4.4.1",
     "koa-passport": "^6.0.0",
     "koa-router": "^14.0.0",
     "mysql2": "^3.19.0",
     "passport-http": "^0.3.0",
+    "passport-jwt": "^4.0.1",
     "role-acl": "^4.5.4",
     "uuid": "^13.0.0"
   }
