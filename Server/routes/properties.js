@@ -2,6 +2,8 @@ const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 
 const auth = require('../controllers/auth');
+const passport = require('koa-passport');
+const can = require('../permissions/properties')
 
 const model = require('../models/properties');
 const locationModel = require('../models/locations');
@@ -11,10 +13,17 @@ const prefix = '/api/v1/properties'
 const router = new Router({ prefix: prefix }); // Prefix means all routes here start with /api/v1/properties
 
 const { validateProperty, validatePropertyUpdate } = require('../controllers/validation');
+const optionalAuth = (ctx, next) => {
+    return passport.authenticate('jwt', { session: false }, (err, user) => {
+        if (user) ctx.state.user = user; // Attach user if token is valid
+        return next(); // Always proceed, even if guest
+    })(ctx, next);
+};
+
 
 // Routes
 router.get('/', getAll);
-router.get('/:id', getById)
+router.get('/:id', optionalAuth, getById)
 router.post('/', auth.requireJWT, bodyParser(), validateProperty, createProperty);
 router.put('/:id', auth.requireJWT, bodyParser(), validatePropertyUpdate, updateProperty);
 router.delete('/:id', auth.requireJWT, deleteProperty);
@@ -22,27 +31,51 @@ router.delete('/:id', auth.requireJWT, deleteProperty);
 // Handlers
 async function getAll(ctx) {
     const data = await model.getAll();
-    ctx.body = data;
+    if (data.length) {
+        ctx.body = data.map(post => {
+            const { ID, title, description, imageURL } = post;
+            
+            const links = {
+                self: `http://${ctx.host}${prefix}/${ID}`
+            }
+
+            return { ID, title, description, imageURL, links };
+        });
+    } else {
+        ctx.body = data; 
+    }
 }
 
 async function createProperty(ctx) {
-    const isAgentIdValid = await agentModel.findAgentById(ctx.request.body.agent_id);
-    const isLocationIdValid = await locationModel.findLocationById(ctx.request.body.location_id);
-    if (!isAgentIdValid.length) {  // If the agentId doesn't exist in the agents table, it is considered unauthorised.
-        ctx.status = 401;
-        ctx.body = { message: "Unauthorized: Invalid agentId." };
-        return;
-    }
-    if (!isLocationIdValid.length) { // If the locationId doesn't exist in the locations table, it is considered a bad request.
-        ctx.status = 400;
-        ctx.body = { message: "Invalid locationId. No such location exists." };
-        return;
-    }
     try{
-        const result = await model.add(ctx.request.body);
+        const body = ctx.request.body;
+
+        const agentId = ctx.state.user.agent_id;
+        // Block users who don't have an agent profile
+        console.log(agentId);
+        if (!agentId) {
+            ctx.status = 403;
+            ctx.body = { message: "Forbidden: You must have an agent profile to create a property." };
+            return;
+        }
+        const isLocationIdValid = await locationModel.getById(body.location_id);
+        if (!isLocationIdValid.length) { // If the locationId doesn't exist in the locations table, it is considered a bad request.
+            ctx.status = 400;
+            ctx.body = { message: "Invalid locationId. No such location exists." };
+            return;
+        }
+
+        body.agent_id = agentId;
+        const result = await model.add(body);
+        
         if (result.affectedRows) {
             ctx.status = 201;
-            ctx.body = { ID: result.insertId, created: true, link: `${ctx.request.path}/${result.insertId}` };
+            ctx.body = { ID: result.insertId, created: true, 
+                link: `http://${ctx.host}${ctx.request.path}/${result.insertId}` 
+            };
+        } else {
+            ctx.status = 400;
+            ctx.body = { message: "Failed to create property." };
         }
     } catch (err) {
         ctx.status = 500;
@@ -51,10 +84,35 @@ async function createProperty(ctx) {
 }
 
 async function getById(ctx){
-    const id = parseInt(ctx.params.id);
+    const id = Number(ctx.params.id);
+    if (isNaN(id) || !Number.isInteger(id) || id <= 0) {
+        ctx.status = 400;
+        ctx.body = { message: "Invalid Property ID." };
+        return;
+    }
     const data = await model.getById(id);
     if(data.length) {
-        ctx.body = data;
+        const property = data[0];
+        const user = ctx.state.user; // Might be undefined if guest
+        // 1. Base HATEOAS Links (Everyone gets these)
+        property.links = {
+            self: `http://${ctx.host}${prefix}/${property.id}`,
+        };
+        // 2. Dynamic RBAC Links
+        if (user) {
+            console.log("here");
+            // Check permissions using the ACL rules defined in Part 1
+            const updatePermission = can.update(user, property);
+            const deletePermission = can.delete(user, property);
+            // If the ACL says yes, add the links!
+            if (updatePermission.granted) {
+                property.links.update = `http://${ctx.host}${prefix}/${property.id}`;
+            }
+            if (deletePermission.granted) {
+                property.links.delete = `http://${ctx.host}${prefix}/${property.id}`;
+            }
+        }
+        ctx.body = property;
     } else {
         ctx.status = 404;
         ctx.body = { message: "Property not found" };
@@ -62,24 +120,53 @@ async function getById(ctx){
 }
 
 async function updateProperty(ctx) {
-    const id = parseInt(ctx.params.id);
-    
-    const isLocationIdValid = await locationModel.findLocationById(ctx.request.body.location_id);
-    if (ctx.request.body.location_id && !isLocationIdValid.length) { // If the locationId doesn't exist in the locations table, it is considered a bad request.
+    const id = Number(ctx.params.id);
+    if (isNaN(id) || !Number.isInteger(id) || id <= 0) {
         ctx.status = 400;
-        ctx.body = { message: "Invalid locationId. No such location exists." };
+        ctx.body = { message: "Invalid Property ID." };
+        return;
+    }
+    
+    const existingData = await model.getById(id); // Fetch the existing property
+    if (!existingData.length) {
+        ctx.status = 404;
+        ctx.body = { message: "Property not found." };
         return;
     }
 
-    const fieldsToUpdate = ctx.request.body;
+    const property = existingData[0];
+
+    // CHECK PERMISSION
+    // ctx.state.user contains the logged-in user (thanks to Passport)
+    const permission = can.update(ctx.state.user, property);
+    if (!permission.granted) {
+        ctx.status = 403; // Forbidden
+        ctx.body = { error: "You do not have permission to edit this property" };
+        return;
+    } 
+    
+    // Check if there is a location id in the request and verify it exist in the Location table
+    const body = ctx.request.body;
+    if (body.location_id){
+        const isLocationIdValid = await locationModel.getById(ctx.request.body.location_id);
+        if (!isLocationIdValid){ 
+            ctx.status = 400;
+            ctx.body = { message: "Bad Request: invalid locationId." };
+            return;
+        }
+    }
+    
+    const { ID, agent_id, ...updateData } = body;
+    Object.assign(property, updateData);
+
     try {
-        const result = await model.updateById(id, fieldsToUpdate);
+        const result = await model.updateById(id, updateData);
         if (result.affectedRows) {
             ctx.status = 200;
-            ctx.body = { message: "Property updated successfully." };
+            ctx.body = { ID: id, updated: true, link: ctx.request.path };
         } else {
-            ctx.status = 404;
-            ctx.body = { message: "Property not found." };
+            ctx.status = 400;
+            ctx.body = { message: "Update Failed" };
         }
     } catch (err) {
         ctx.status = 500;
@@ -88,8 +175,31 @@ async function updateProperty(ctx) {
 }
 
 async function deleteProperty(ctx) {
-    const id = parseInt(ctx.params.id);
+    const id = Number(ctx.params.id);
+    if (isNaN(id) || !Number.isInteger(id) || id <= 0) {
+        ctx.status = 400;
+        ctx.body = { message: "Invalid Property ID." };
+        return;
+    }
+    
     try {
+        const existingData = await model.getById(id); // Fetch the existing property
+        if (!existingData.length) {
+            ctx.status = 404;
+            ctx.body = { message: "Property not found." };
+            return;
+        }
+
+        const property = existingData[0];
+
+        // CHECK PERMISSION
+        const permission = can.delete(ctx.state.user, property);
+        if (!permission.granted) {
+            ctx.status = 403; // Forbidden
+            ctx.body = { error: "You do not have permission to delete this property" };
+            return;
+        } 
+
         const result = await model.deleteById(id);
         if (result.affectedRows) {
             ctx.status = 200;
