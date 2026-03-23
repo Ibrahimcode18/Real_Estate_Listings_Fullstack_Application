@@ -6,6 +6,13 @@ exports.getPropertiesById = async function getPropertiesById(id) {
     return data;
 }
 
+// GET the Location with the parameter id
+exports.getById = async function getById(id){
+    const query = "SELECT * FROM locations WHERE id = ?;";
+    const data = await db.run_query(query, [id]);
+    return data;
+}
+
 exports.getAll = async function getAll() {
     const query = "SELECT * FROM locations;";
     const data = await db.run_query(query);
