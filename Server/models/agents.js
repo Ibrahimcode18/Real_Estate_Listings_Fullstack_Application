@@ -6,6 +6,12 @@ exports.getById = async function getById (id) {
     return data;
 }
 
+exports.getByUserId = async function getByUserId (id){
+    const query = "SELECT * FROM agents WHERE user_id = ?;";
+    const data = await db.run_query(query, [id]);
+    return data;
+}
+
 exports.getAll = async function getAll () {
     const query = "SELECT * FROM agents;";
     const data = await db.run_query(query);
