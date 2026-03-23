@@ -17,7 +17,10 @@ const checkJwtPayload = async (jwt_payload, done) => {
 
         if (result.length) {
             console.log(`Successfully authenticated user via JWT: ${result[0].username}`);
-            return done(null, result[0]); // Pass the full user object to the route
+            const user = result[0]; 
+            // Glue the agent_id from the token payload onto the user object
+            user.agent_id = jwt_payload.agent_id;
+            return done(null, user); // Pass the full user object to the route
         } else {
             console.log("JWT matched, but user no longer exists in DB.");
             return done(null, false);

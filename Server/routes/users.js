@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 
 const model = require('../models/users');
+const agentModel = require('../models/agents')
 const { validateUser, validateUserUpdate } = require('../controllers/validation'); // Import our checker
 const prefix = '/api/v1/users';
 const router = new Router({ prefix: prefix });
@@ -67,12 +68,17 @@ async function getById(ctx) { // Anybody can access this for now, but we will ad
 async function loginUser(ctx) {
     // Because the requireBasic guard passed, ctx.state.user is already populated!
     const user = ctx.state.user;
+
+    // Get the user's agent_id for easier creation of properties
+    const agentInfo = await agentModel.getByUserId(user.id);
     // Define the payload (claims) we want to embed in the token
     const payload = {
-        ID: user.ID,
+        ID: user.id,
         username: user.username,
-        role: user.role
+        role: user.role,
+        agent_id: agentInfo.length ? agentInfo[0].id : null
     };
+    
     // Sign the token (Must match the secret in strategies/jwt.js)
     const token = jwt.sign(payload, 'my_super_secure_secret_key_123', { expiresIn: '1h' });
     ctx.status = 200;
