@@ -5,6 +5,7 @@ const userUpdateSchema = require('../schemas/user.json').definitions.userUpdate;
 const propertySchema = require('../schemas/property.json').definitions.property;
 const propertyUpdateSchema = require('../schemas/property.json').definitions.propertyUpdate;
 const locationSchema = require('../schemas/location.json').definitions.location;
+const locationUpdateSchema = require('../schemas/location.json').definitions.locationUpdate;
 const agentSchema = require('../schemas/agent.json').definitions.agent;
 const agentUpdateSchema = require('../schemas/agent.json').definitions.agentUpdate;
 
@@ -42,6 +43,7 @@ exports.validateProperty = makeKoaValidator(propertySchema, 'property');
 exports.validatePropertyUpdate = makeKoaValidator(propertyUpdateSchema, 'propertyUpdate');
 
 exports.validateLocation = makeKoaValidator(locationSchema, 'location');
+exports.validateLocationUpdate = makeKoaValidator(locationUpdateSchema, 'locationUpdate');
 
 exports.validateAgent = makeKoaValidator(agentSchema, 'agent');
 exports.validateAgentUpdate = makeKoaValidator(agentUpdateSchema, 'agentUpdate');
