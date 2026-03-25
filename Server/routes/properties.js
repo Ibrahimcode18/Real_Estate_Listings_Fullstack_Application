@@ -3,16 +3,16 @@ const bodyParser = require('koa-bodyparser');
 
 const auth = require('../controllers/auth');
 const passport = require('koa-passport');
-const can = require('../permissions/properties')
+const can = require('../permissions/properties');
 
 const model = require('../models/properties');
 const locationModel = require('../models/locations');
-const agentModel = require('../models/agents');
 
 const prefix = '/api/v1/properties'
 const router = new Router({ prefix: prefix }); // Prefix means all routes here start with /api/v1/properties
 
 const { validateProperty, validatePropertyUpdate } = require('../controllers/validation');
+
 const optionalAuth = (ctx, next) => {
     return passport.authenticate('jwt', { session: false }, (err, user) => {
         if (user) ctx.state.user = user; // Attach user if token is valid
@@ -23,26 +23,33 @@ const optionalAuth = (ctx, next) => {
 
 // Routes
 router.get('/', getAll);
-router.get('/:id', optionalAuth, getById)
+router.get('/:id', optionalAuth, getById);
 router.post('/', auth.requireJWT, bodyParser(), validateProperty, createProperty);
 router.put('/:id', auth.requireJWT, bodyParser(), validatePropertyUpdate, updateProperty);
 router.delete('/:id', auth.requireJWT, deleteProperty);
 
 // Handlers
 async function getAll(ctx) {
-    const data = await model.getAll();
-    if (data.length) {
-        ctx.body = data.map(post => {
-            const { ID, title, description, imageURL } = post;
-            
-            const links = {
-                self: `http://${ctx.host}${prefix}/${ID}`
-            }
+    try{
+        const data = await model.getAll();
+        if (data.length) {
+            ctx.body = data.map(post => {
+                const { id, title, description, image_url } = post;
+                
+                const links = {
+                    self: `http://${ctx.host}${prefix}/${id}`
+                }
 
-            return { ID, title, description, imageURL, links };
-        });
-    } else {
-        ctx.body = data; 
+                return { id, title, description, image_url, links };
+            });
+        } else {
+            ctx.status = 404;
+            ctx.body = { message: "No properties found" };
+        }
+    } catch(err){
+        console.error("Error fetching properties:", err);
+        ctx.status = 500;
+        ctx.body = { message: "An error occurred while fetching properties." };
     }
 }
 
@@ -52,7 +59,6 @@ async function createProperty(ctx) {
 
         const agentId = ctx.state.user.agent_id;
         // Block users who don't have an agent profile
-        console.log(agentId);
         if (!agentId) {
             ctx.status = 403;
             ctx.body = { message: "Forbidden: You must have an agent profile to create a property." };
@@ -78,6 +84,7 @@ async function createProperty(ctx) {
             ctx.body = { message: "Failed to create property." };
         }
     } catch (err) {
+        console.log("Error occured while creating property:", err)
         ctx.status = 500;
         ctx.body = { message: "An error occurred while creating the property." };
     }
@@ -90,32 +97,37 @@ async function getById(ctx){
         ctx.body = { message: "Invalid Property ID." };
         return;
     }
-    const data = await model.getById(id);
-    if(data.length) {
-        const property = data[0];
-        const user = ctx.state.user; // Might be undefined if guest
-        // 1. Base HATEOAS Links (Everyone gets these)
-        property.links = {
-            self: `http://${ctx.host}${prefix}/${property.id}`,
-        };
-        // 2. Dynamic RBAC Links
-        if (user) {
-            console.log("here");
-            // Check permissions using the ACL rules defined in Part 1
-            const updatePermission = can.update(user, property);
-            const deletePermission = can.delete(user, property);
-            // If the ACL says yes, add the links!
-            if (updatePermission.granted) {
-                property.links.update = `http://${ctx.host}${prefix}/${property.id}`;
+    try{
+        const data = await model.getById(id);
+        if(data.length) {
+            const property = data[0];
+            const user = ctx.state.user; // Might be undefined if guest
+            // 1. Base HATEOAS Links (Everyone gets these)
+            property.links = {
+                self: `http://${ctx.host}${prefix}/${property.id}`,
+            };
+            // 2. Dynamic RBAC Links
+            if (user) {
+                // Check permissions using the ACL rules defined in Part 1
+                const updatePermission = can.update(user, property);
+                const deletePermission = can.delete(user, property);
+                // If the ACL says yes, add the links!
+                if (updatePermission.granted) {
+                    property.links.update = `http://${ctx.host}${prefix}/${property.id}`;
+                }
+                if (deletePermission.granted) {
+                    property.links.delete = `http://${ctx.host}${prefix}/${property.id}`;
+                }
             }
-            if (deletePermission.granted) {
-                property.links.delete = `http://${ctx.host}${prefix}/${property.id}`;
-            }
+            ctx.body = property;
+        } else {
+            ctx.status = 404;
+            ctx.body = { message: "Property not found" };
         }
-        ctx.body = property;
-    } else {
-        ctx.status = 404;
-        ctx.body = { message: "Property not found" };
+    } catch (err){
+        console.error("Error fetching property by id:", err);
+        ctx.status = 500;
+        ctx.body = { message: "An error occurred while fetching property by id." };
     }
 }
 
@@ -126,40 +138,36 @@ async function updateProperty(ctx) {
         ctx.body = { message: "Invalid Property ID." };
         return;
     }
-    
-    const existingData = await model.getById(id); // Fetch the existing property
-    if (!existingData.length) {
-        ctx.status = 404;
-        ctx.body = { message: "Property not found." };
-        return;
-    }
-
-    const property = existingData[0];
-
-    // CHECK PERMISSION
-    // ctx.state.user contains the logged-in user (thanks to Passport)
-    const permission = can.update(ctx.state.user, property);
-    if (!permission.granted) {
-        ctx.status = 403; // Forbidden
-        ctx.body = { error: "You do not have permission to edit this property" };
-        return;
-    } 
-    
-    // Check if there is a location id in the request and verify it exist in the Location table
-    const body = ctx.request.body;
-    if (body.location_id){
-        const isLocationIdValid = await locationModel.getById(ctx.request.body.location_id);
-        if (!isLocationIdValid){ 
-            ctx.status = 400;
-            ctx.body = { message: "Bad Request: invalid locationId." };
+    try {
+        const existingData = await model.getById(id); // Fetch the existing property
+        if (!existingData.length) {
+            ctx.status = 404;
+            ctx.body = { message: "Property not found." };
             return;
         }
-    }
-    
-    const { ID, agent_id, ...updateData } = body;
-    Object.assign(property, updateData);
+        const property = existingData[0];
 
-    try {
+        // CHECK PERMISSION
+        // ctx.state.user contains the logged-in user (thanks to Passport)
+        const permission = can.update(ctx.state.user, property);
+        if (!permission.granted) {
+            ctx.status = 403; // Forbidden
+            ctx.body = { error: "You do not have permission to edit this property" };
+            return;
+        } 
+        
+        // Check if there is a location id in the request and verify it exist in the Location table
+        const body = ctx.request.body;
+        if (body.location_id){
+            const isLocationIdValid = await locationModel.getById(ctx.request.body.location_id);
+            if (!isLocationIdValid){ 
+                ctx.status = 400;
+                ctx.body = { message: "Bad Request: invalid locationId." };
+                return;
+            }
+        }
+
+        const { ID, agent_id, ...updateData } = body;
         const result = await model.updateById(id, updateData);
         if (result.affectedRows) {
             ctx.status = 200;
@@ -169,6 +177,7 @@ async function updateProperty(ctx) {
             ctx.body = { message: "Update Failed" };
         }
     } catch (err) {
+        console.log("Error occured while updating property: ", err);
         ctx.status = 500;
         ctx.body = { message: "An error occurred while updating the property." };
     }
@@ -209,6 +218,7 @@ async function deleteProperty(ctx) {
             ctx.body = { message: "Property not found." };
         }
     } catch (err) {
+        console.log("Error occured while deleting property: ", err);
         ctx.status = 500;
         ctx.body = { message: "An error occurred while deleting the property." };
     }
