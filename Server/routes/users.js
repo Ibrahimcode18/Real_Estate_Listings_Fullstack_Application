@@ -44,7 +44,7 @@ async function createUser(ctx) {
     }
 }
 
-async function getAll(ctx) {  // Anybody can access this for now, but we will add authentication later
+async function getAll(ctx) {  
     try{
         const permission = can.readAll(ctx.state.user);
         if (!permission.granted) {
@@ -66,7 +66,7 @@ async function getAll(ctx) {  // Anybody can access this for now, but we will ad
     }   
 }
 
-async function getById(ctx) { // Anybody can access this for now, but we will add authentication later
+async function getById(ctx) { 
     const id = Number(ctx.params.id);
     if (isNaN(id) || !Number.isInteger(id) || id <= 0) {
         ctx.status = 400;
