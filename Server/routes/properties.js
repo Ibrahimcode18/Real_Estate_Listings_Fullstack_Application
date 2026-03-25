@@ -7,6 +7,7 @@ const can = require('../permissions/properties');
 
 const model = require('../models/properties');
 const locationModel = require('../models/locations');
+const agentModel = require('../models/agents');
 
 const prefix = '/api/v1/properties'
 const router = new Router({ prefix: prefix }); // Prefix means all routes here start with /api/v1/properties
@@ -64,6 +65,15 @@ async function createProperty(ctx) {
             ctx.body = { message: "Forbidden: You must have an agent profile to create a property." };
             return;
         }
+
+        const agent = await agentModel.getById(agentId);
+        const isAgentApproved = agent[0].is_approved;
+        if (isAgentApproved === 0){
+            ctx.status = 403;
+            ctx.body = { message: "Forbidden: You have not being approved or you are suspended"};
+            return;
+        }
+
         const isLocationIdValid = await locationModel.getById(body.location_id);
         if (!isLocationIdValid.length) { // If the locationId doesn't exist in the locations table, it is considered a bad request.
             ctx.status = 400;
