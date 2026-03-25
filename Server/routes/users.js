@@ -10,13 +10,15 @@ const bcrypt = require('bcrypt');
 
 const auth = require('../controllers/auth');
 const jwt = require('jsonwebtoken');
+
+const can = require('../permissions/users');
 // Routes
 // We insert 'validateUser' BEFORE 'createUser'
 // If validation fails, createUser never runs.
 router.post('/', bodyParser(), validateUser, createUser);
-router.get('/', getAll);
-router.get('/:id', getById);
-router.put('/:id', bodyParser(), validateUserUpdate, updateUser);
+router.get('/', auth.requireJWT, getAll);
+router.get('/:id', auth.requireJWT, getById);
+router.put('/:id', auth.requireJWT, bodyParser(), validateUserUpdate, updateUser);
 router.post('/login', auth.requireBasic, loginUser);
 
 async function createUser(ctx) {
@@ -43,25 +45,65 @@ async function createUser(ctx) {
 }
 
 async function getAll(ctx) {  // Anybody can access this for now, but we will add authentication later
-    const results = await model.getAll();
-    ctx.body = results.map(u => {
-        const user = { ...u };
-        delete user.password;
-        return user;
-    });
+    try{
+        const permission = can.readAll(ctx.state.user);
+        if (!permission.granted) {
+            ctx.status = 403;
+            ctx.body = { message: "Forbidden: Only admins can view all users." };
+            return;
+        }
+
+        const results = await model.getAll();
+        ctx.body = results.map(u => {
+            const user = { ...u };
+            delete user.password;
+            return user;
+        });
+    } catch (err){
+        console.log("An Error occured fetching all users", err);
+        ctx.status = 500;
+        ctx.body = { message: "An error occured while fetching all users"}
+    }   
 }
 
 async function getById(ctx) { // Anybody can access this for now, but we will add authentication later
-    const id = ctx.params.id;
-    const result = await model.getById(id);
-    if (result.length) {
-        const user = result[0];
-        // IMPORTANT: Never send the password back, even the hash!
-        delete user.password;
-        ctx.body = user;
-    } else {
-        ctx.status = 404;
-        ctx.body = { message: "User not found" };
+    const id = Number(ctx.params.id);
+    if (isNaN(id) || !Number.isInteger(id) || id <= 0) {
+        ctx.status = 400;
+        ctx.body = { message: "Invalid User ID." };
+        return;
+    }
+
+    try{
+        const existingData = await model.getById(id); // Fetch the existing user
+        if (!existingData.length) {
+            ctx.status = 404;
+            ctx.body = { message: "User not found." };
+            return;
+        }
+        const user = existingData[0];
+
+        const permission = can.read(ctx.state.user, user);
+        if (!permission.granted) {
+            ctx.status = 403;
+            ctx.body = { message: "Forbidden: You do not have access to this data" };
+            return;
+        }
+
+        const result = await model.getById(id);
+        if (result.length) {
+            const user = result[0];
+            // IMPORTANT: Never send the password back, even the hash!
+            delete user.password;
+            ctx.body = user;
+        } else {
+            ctx.status = 404;
+            ctx.body = { message: "User not found" };
+        }
+    } catch (err){
+        console.log("An Error occured fetching user details", err);
+        ctx.status = 500;
+        ctx.body = { message: "An error occured while fetching user details"}
     }
 }
 
@@ -76,7 +118,8 @@ async function loginUser(ctx) {
         ID: user.id,
         username: user.username,
         role: user.role,
-        agent_id: agentInfo.length ? agentInfo[0].id : null
+        agent_id: agentInfo.length ? agentInfo[0].id : null,
+        links: `${prefix}/${user.id}`
     };
     
     // Sign the token (Must match the secret in strategies/jwt.js)
@@ -89,28 +132,46 @@ async function loginUser(ctx) {
     };
 }
 
-
 async function updateUser(ctx) {
-    const id = ctx.params.id;
-    const body = ctx.request.body;
-    const fieldsToUpdate = ctx.request.body;
-
-    if (body.password) {
-        fieldsToUpdate.password = bcrypt.hashSync(body.password, 10);
+    const id = Number(ctx.params.id);
+    if (isNaN(id) || !Number.isInteger(id) || id <= 0) {
+        ctx.status = 400;
+        ctx.body = { message: "Invalid User ID." };
+        return;
     }
-    try {
+
+    try{
+        const existingData = await model.getById(id); // Fetch the existing user
+        if (!existingData.length) {
+            ctx.status = 404;
+            ctx.body = { message: "User not found." };
+            return;
+        }
+        const user = existingData[0];
+
+        const permission = can.update(ctx.state.user, user);
+        if (!permission.granted) {
+            ctx.status = 403;
+            ctx.body = { message: "Forbidden: You do not have permission make an update" };
+            return;
+        }
+        const body = ctx.request.body;
+        const fieldsToUpdate = ctx.request.body;
+
+        if (body.password) {
+            fieldsToUpdate.password = bcrypt.hashSync(body.password, 10);
+        }
+        
         const result = await model.updateById(id, fieldsToUpdate);
         if (result.affectedRows) {
             ctx.status = 200;
-            ctx.body = { message: "User updated successfully." };
-        } else {
-            ctx.status = 404;
-            ctx.body = { message: "User not found." };
-        }
-    } catch (err) {
+            ctx.body = { message: "User updated successfully.", link: ctx.request.path };
+        } 
+    }catch (err) {
+        console.log("Error occured while trying to update user: ", err);
         ctx.status = 500;
         ctx.body = { message: "An error occurred while updating the user." };
-    }  
+    }
 }
 
 
