@@ -38,3 +38,21 @@ exports.updateById = async function updateById (id, fieldsToUpdate) {
     const data = await db.run_query(query, values);
     return data;
 }
+
+exports.approve = async function approve (id){
+    const query = "UPDATE agents SET is_approved = 1 WHERE id = ?";
+    const data = await db.run_query(query, [id]);
+    return data;
+}
+
+exports.suspend = async function suspend (id){
+    const query = "UPDATE agents SET is_approved = 0 WHERE id = ?";
+    const data = await db.run_query(query, [id]);
+    return data;
+}
+
+exports.updateRole = async function updateRole (id) {
+    const query = "UPDATE users SET role = 'agent' WHERE id = ?";
+    const data = await db.run_query(query, [id]);
+    return data;
+}
