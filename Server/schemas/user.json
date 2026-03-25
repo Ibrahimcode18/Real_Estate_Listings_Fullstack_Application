@@ -8,8 +8,8 @@
                 "email": { "type": "string", "format": "email", "maxLength": 64 },
                 "password": { "type": "string", "minLength": 8, "maxLength": 15 },
                 "role": { "type": "string", "enum": ["user", "admin", "agent"] },
-                "firstName": { "type": "string", "maxLength": 32 },
-                "lastName": { "type": "string", "maxLength": 32 }
+                "first_name": { "type": "string", "maxLength": 32 },
+                "last_name": { "type": "string", "maxLength": 32 }
             },
             "required": ["username", "email", "password"],
             "additionalProperties": false
@@ -17,8 +17,8 @@
         "userUpdate": {
             "type": "object",
             "properties": {
-                "firstName": { "type": "string", "maxLength": 32 },
-                "lastName": { "type": "string", "maxLength": 32 },
+                "first_name": { "type": "string", "maxLength": 32 },
+                "last_name": { "type": "string", "maxLength": 32 },
                 "password": { "type": "string", "minLength": 8, "maxLength": 15 },
                 "email": { "type": "string", "format": "email", "maxLength": 64 }
             },
