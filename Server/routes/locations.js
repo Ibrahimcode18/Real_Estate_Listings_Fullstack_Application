@@ -120,7 +120,7 @@ async function updateLocation(ctx) {
     const id = Number(ctx.params.id);
     if (isNaN(id) || !Number.isInteger(id) || id <= 0) {
         ctx.status = 400;
-        ctx.body = { message: "Invalid Property ID." };
+        ctx.body = { message: "Invalid Location ID." };
         return;
     }
     
@@ -163,7 +163,7 @@ async function deleteLocation(ctx) {
     const id = Number(ctx.params.id);
     if (isNaN(id) || !Number.isInteger(id) || id <= 0) {
         ctx.status = 400;
-        ctx.body = { message: "Invalid Property ID." };
+        ctx.body = { message: "Invalid Location ID." };
         return;
     }
     
