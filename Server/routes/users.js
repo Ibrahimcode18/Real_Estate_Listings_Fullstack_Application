@@ -57,6 +57,9 @@ async function getAll(ctx) {
         ctx.body = results.map(u => {
             const user = { ...u };
             delete user.password;
+            user.links = {
+                self: `http://${ctx.host}${prefix}/${user.id}`
+            }
             return user;
         });
     } catch (err){
@@ -95,7 +98,12 @@ async function getById(ctx) {
             const user = result[0];
             // IMPORTANT: Never send the password back, even the hash!
             delete user.password;
+            user.links = {
+                self: `http://${ctx.host}${prefix}/${user.id}`,
+                update: `http://${ctx.host}${prefix}/${user.id}`
+            };
             ctx.body = user;
+            
         } else {
             ctx.status = 404;
             ctx.body = { message: "User not found" };
