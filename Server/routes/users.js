@@ -93,21 +93,14 @@ async function getById(ctx) {
             return;
         }
 
-        const result = await model.getById(id);
-        if (result.length) {
-            const user = result[0];
-            // IMPORTANT: Never send the password back, even the hash!
-            delete user.password;
-            user.links = {
-                self: `http://${ctx.host}${prefix}/${user.id}`,
-                update: `http://${ctx.host}${prefix}/${user.id}`
-            };
-            ctx.body = user;
+        // IMPORTANT: Never send the password back, even the hash!
+        delete user.password;
+        user.links = {
+            self: `http://${ctx.host}${prefix}/${user.id}`,
+            update: `http://${ctx.host}${prefix}/${user.id}`
+        };
+        ctx.body = user;
             
-        } else {
-            ctx.status = 404;
-            ctx.body = { message: "User not found" };
-        }
     } catch (err){
         console.log("An Error occured fetching user details", err);
         ctx.status = 500;
