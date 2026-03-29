@@ -4,7 +4,8 @@ exports.getPropertiesById = async function getPropertiesById(id) {
     const query = `
         SELECT properties.*, locations.city AS location 
         FROM properties 
-        JOIN locations ON properties.location_id = ?`;
+        JOIN locations ON properties.location_id = locations.id
+        WHERE properties.location_id = ?`;
     const data = await db.run_query(query, [id]);
     return data;
 }
