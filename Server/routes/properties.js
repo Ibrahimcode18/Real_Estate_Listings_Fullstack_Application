@@ -35,13 +35,13 @@ async function getAll(ctx) {
         const data = await model.getAll();
         if (data.length) {
             ctx.body = data.map(post => {
-                const { id, title, description, image_url } = post;
+                const { id, title, description, listing_type, price, location, image_url } = post;
                 
                 const links = {
                     self: `http://${ctx.host}${prefix}/${id}`
                 }
 
-                return { id, title, description, image_url, links };
+                return { id, title, description, image_url, listing_type, price, location, links };
             });
         } else {
             ctx.status = 404;
