@@ -29,7 +29,7 @@
               :title="property.title"
               :location="property.location"
               :price="property.price"
-              :imageURL="property.imageURL"
+              :imageURL="property.image_url"
               :listing_type="property.listing_type"
           />
       </router-link>
