@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { MessageOutlined } from '@ant-design/icons-vue';
+import { MessageOutlined, DeleteOutlined } from '@ant-design/icons-vue';
 import { useUserStore } from '@/stores/user';
 
 const route = useRoute();
@@ -11,6 +11,7 @@ const loading = ref(true);
 const userStore = useUserStore();
 const locations = ref([]);
 const isUpdating = ref(false);
+const isDeleting = ref(false);
 
 const updateFormState = reactive({
     title: '',
@@ -87,6 +88,31 @@ const onUpdate = async () => {
     }
 };
 
+const onDelete = async () => {
+    isDeleting.value = true;
+    try {
+        const response = await fetch(`http://localhost:3000/api/v1/properties/${property.value.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (response.ok) {
+            alert('Property deleted successfully.');
+            router.push('/'); 
+        } else {
+            const errorData = await response.json();
+            alert(`Delete failed: ${errorData.message}`);
+        }
+    } catch (error) {
+        console.error("Delete Error:", error);
+        alert("A network error occurred while trying to delete.");
+    } finally {
+        isDeleting.value = false;
+    }
+};
+
 onMounted(() => {
     fetchPropertyDetails();
 });
@@ -147,6 +173,21 @@ onMounted(() => {
         <div v-else style="text-align: center; margin-top: 50px;">
             <h2>Property not found.</h2>
             <a-button @click="router.push('/')">Return to Home</a-button>
+        </div>
+
+        <div v-if="canEdit" style="display: flex; justify-content: flex-end; margin-top: 32px; margin-bottom: 16px;">
+            <a-popconfirm
+                title="Are you sure you want to delete this listing? This cannot be undone."
+                ok-text="Yes, Delete"
+                cancel-text="Cancel"
+                placement="left"
+                @confirm="onDelete"
+            >
+                <a-button type="primary" danger :loading="isDeleting">
+                    <template #icon><DeleteOutlined /></template>
+                    Delete Property
+                </a-button>
+            </a-popconfirm>
         </div>
 
         <a-card v-if="canEdit" title="Edit Property Details" style="margin-top: 32px; border: 1px solid #1890ff;">
