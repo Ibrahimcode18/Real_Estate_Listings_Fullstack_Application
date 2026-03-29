@@ -53,6 +53,7 @@ async function getAll(ctx) {
             agent.links = {
                 self: `http://${ctx.host}${prefix}/${agent.id}`
             }
+            return agent;
         });
     } catch (err){
         console.log("An Error occured fetching all agents", err);
