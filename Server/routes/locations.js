@@ -95,13 +95,12 @@ async function getPropertiesById(ctx) {
         const data = await model.getPropertiesById(id);
         if (data.length) {
             ctx.body = data.map(post => {
-                const { id, title, description, imageURL } = post;
+                const { id, title, description, listing_type, price, location, image_url } = post;
                 
                 const links = {
                     self: `http://${ctx.host}/api/v1/properties/${id}`
                 }
-
-                return { id, title, description, imageURL, links };
+                return { id, title, description, listing_type, price, location, image_url };
             });
 
         } else {
