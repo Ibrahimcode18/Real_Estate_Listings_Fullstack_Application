@@ -13,7 +13,6 @@ ac.grant('admin').execute('suspend').on('agent');
 // --- AGENTS ---
 // Agents can only view and edit their OWN profiles
 ac.grant('agent')
-    .condition({ Fn: 'EQUALS', args: { 'requester': '$.owner' } })
     .execute('read')
     .on('agent');
 
@@ -27,6 +26,9 @@ ac.grant('agent')
     .execute('update')
     .on('agent');
 
+ac.grant('user')
+    .execute('read')
+    .on('agent');
 
 exports.readAll = (requester) => {
     if (!ac.hasRole(requester.role)) return { granted: false };
