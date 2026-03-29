@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import PropertyCard from '@/components/PropertyCard.vue'; // Make sure this path is correct
 
 const route = useRoute();
+const router = useRouter();
 const properties = ref([]);
 const loading = ref(true);
 
@@ -34,8 +35,11 @@ onMounted(() => {
 
 <template>
     <div style="padding: 20px;">
-        <h1 style="margin-bottom: 24px;">Properties in {{ locationName }}</h1>
-
+        <a-page-header style="padding: 0 0 20px 0;" @back="() => router.go(-1)">
+            <template #title>
+                <h2 style="margin: 0;">Properties in {{ locationName }}</h2>
+            </template>
+        </a-page-header>
         <div v-if="loading" style="text-align: center; margin-top: 50px;">
             <a-spin size="large" />
         </div>
