@@ -85,11 +85,13 @@ async function getById(ctx) {
             ctx.body = { message: "Forbidden: You do not have access to this data" };
             return;
         }
-
-        agent.links = {
-            self:  `http://${ctx.host}${prefix}/${agent.id}`,
-            update: `http://${ctx.host}${prefix}/${agent.id}`
-        };
+        const permission2 = can.update(ctx.state.user, agent);
+        if (permission2.granted){
+            agent.links = {
+                self:  `http://${ctx.host}${prefix}/${agent.id}`,
+                update: `http://${ctx.host}${prefix}/${agent.id}`
+            };
+        }
         ctx.body = agent;
 
     } catch (err){
