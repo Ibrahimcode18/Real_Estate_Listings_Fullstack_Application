@@ -17,10 +17,11 @@
         "userUpdate": {
             "type": "object",
             "properties": {
+                "username": {"type": "string", "maxLength": 15, "minLength": 3},
                 "first_name": { "type": "string", "maxLength": 32 },
                 "last_name": { "type": "string", "maxLength": 32 },
                 "password": { "type": "string", "minLength": 8, "maxLength": 15 },
-                "email": { "type": "string", "format": "email", "maxLength": 64 }
+                "email": { "type": "string", "format": "email", "maxLength": 64, "minLength": 12 }
             },
             "additionalProperties": false
         }
