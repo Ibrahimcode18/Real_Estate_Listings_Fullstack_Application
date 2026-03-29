@@ -4,14 +4,13 @@
     import { useUserStore } from '@/stores/user';
 
     const router = useRouter();
-    const userStore = useUserStore(); // Initialize the store
+    const userStore = useUserStore();
     const loading = ref(false);
     const formState = reactive({ username: '', password: '' });
 
     const onFinish = async (values) => {
         loading.value = true;
 
-        // Create the Basic Auth String
         const authString = btoa(`${values.username}:${values.password}`);
 
         try {
@@ -25,19 +24,15 @@
             if (response.ok) {
                 const data = await response.json();
                 
-                // 1. Grab BOTH the user and the token from your backend response
                 const user = data.user;
-                const token = data.token; // Make sure 'token' matches your backend's exact key name!
+                const token = data.token; 
 
-                // 2. SAVE TO PINIA (The Global Brain)
                 userStore.login(user);
                 
-                // 3. THE FIX: Save the JWT token using the exact key your Profile page is looking for
                 localStorage.setItem("token", token); 
 
                 alert('Welcome back ' + user.username);
                 
-                // Check the URL for a redirect tag, otherwise default to '/'
                 const redirectPath = router.currentRoute.value.query.redirect || '/';
                 router.push(redirectPath);
             } else {
