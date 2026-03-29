@@ -60,7 +60,6 @@ const onSubmit = async () => {
     isSubmitting.value = true;
 
     try {
-        console.log("Starting Step 1: Uploading Image...");
         // Image Upload
         const formData = new FormData();
         formData.append('upload', imageFile.value); 
@@ -79,8 +78,6 @@ const onSubmit = async () => {
         const finalImageUrl = imageData.links.path;
         
         // Upload property fields
-        console.log("Starting Step 2: Saving Property Data...");
-        
         formState.image_url = finalImageUrl;
         const propertyResponse = await fetch('http://localhost:3000/api/v1/properties', {
             method: 'POST',
