@@ -1,13 +1,20 @@
 const db = require('../helpers/database'); 
 
 exports.getAll = async function getAll() {
-    const query = "SELECT * FROM properties;";
+    const query = `
+        SELECT properties.*, locations.city AS location 
+        FROM properties 
+        JOIN locations ON properties.location_id = locations.id`;
     const data = await db.run_query(query);
     return data;
 }
 
 exports.getById = async function getById (id) {
-    const query = "SELECT * FROM properties WHERE ID = ?;";
+    const query = `
+        SELECT properties.*, locations.city AS location 
+        FROM properties 
+        JOIN locations ON properties.location_id = locations.id
+        WHERE properties.id = ?`;
     const data = await db.run_query(query, [id]);
     return data;
 }
