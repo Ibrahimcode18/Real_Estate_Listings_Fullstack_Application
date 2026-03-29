@@ -21,7 +21,6 @@ const updateFormState = reactive({
     location_id: null
 });
 
-
 const canEdit = computed(() => {
     if (!userStore.user || !property.value) return false;
     return userStore.user.role === 'admin' || userStore.user.agent_id === property.value.agent_id;
@@ -45,7 +44,7 @@ const fetchPropertyDetails = async () => {
             Object.assign(updateFormState, {
                 title: property.value.title,
                 description: property.value.description,
-                price: property.value.price,
+                price: Number(property.value.price),
                 listing_type: property.value.listing_type,
                 location_id: property.value.location_id
             });
@@ -134,10 +133,12 @@ onMounted(() => {
                 @back="() => router.go(-1)"
             >
                 <template #extra>
-                    <a-button type="primary" size="large" @click="router.push(`/agency/${property.agent_id}`)">
+                    <router-link :to="`/agency/${property.agent_id}`" style="text-decoration: none;">
+                    <a-button type="primary" size="large">
                         <template #icon><MessageOutlined /></template>
                         Contact Agency For Enquiries
                     </a-button>
+                </router-link>
                 </template>
             </a-page-header>
 
@@ -195,17 +196,17 @@ onMounted(() => {
                 
                 <a-row :gutter="16">
                     <a-col :xs="24" :md="12">
-                        <a-form-item label="Property Title" name="title" :rules="[{ required: true }]">
+                        <a-form-item label="Property Title" name="title" :rules="[{ required: true, message: 'Property title is required' }]">
                             <a-input v-model:value="updateFormState.title" :maxlength="62" />
                         </a-form-item>
                     </a-col>
                     <a-col :xs="24" :md="6">
-                        <a-form-item label="Price (£)" name="price" :rules="[{ required: true }]">
+                        <a-form-item label="Price (£)" name="price" :rules="[{ required: true, message: 'Price is required' }]">
                             <a-input-number v-model:value="updateFormState.price" style="width: 100%" :min="0" />
                         </a-form-item>
                     </a-col>
                     <a-col :xs="24" :md="6">
-                        <a-form-item label="Listing Type" name="listing_type" :rules="[{ required: true }]">
+                        <a-form-item label="Listing Type" name="listing_type" :rules="[{ required: true, message: 'Listing type is required' }]">
                             <a-select v-model:value="updateFormState.listing_type">
                                 <a-select-option value="sale">For Sale</a-select-option>
                                 <a-select-option value="rent">For Rent</a-select-option>
@@ -226,7 +227,7 @@ onMounted(() => {
                     </a-col>
                 </a-row>
 
-                <a-form-item label="Description" name="description" :rules="[{ required: true }]">
+                <a-form-item label="Description" name="description" :rules="[{ required: true, message: 'Description is required' }]">
                     <a-textarea v-model:value="updateFormState.description" :rows="4" />
                 </a-form-item>
 
