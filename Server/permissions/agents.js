@@ -1,8 +1,7 @@
 const AccessControl = require('role-acl');
 const ac = new AccessControl();
 
-// --- THE ADMIN ---
-// Admins have absolute power over the 'agent' resource
+// Admin 
 ac.grant('admin').execute('readAll').on('agent'); 
 ac.grant('admin').execute('read').on('agent');
 ac.grant('admin').execute('update').on('agent');
@@ -10,8 +9,7 @@ ac.grant('admin').execute('readAllProperties').on('property');
 ac.grant('admin').execute('approve').on('agent');
 ac.grant('admin').execute('suspend').on('agent');
 
-// --- AGENTS ---
-// Agents can only view and edit their OWN profiles
+// Agent
 ac.grant('agent')
     .execute('read')
     .on('agent');
@@ -50,7 +48,6 @@ exports.read = (requester, targetAgent) => {
     
     return ac
         .can(requester.role)
-        // targetAgent.id is the ID of the agent profile they are trying to view
         .context({ requester: requester.agent_id, owner: targetAgent.id }) 
         .execute('read')
         .sync()
@@ -62,7 +59,6 @@ exports.readAllProperties = (requester, targetAgentId) => {
     
     return ac
         .can(requester.role)
-        // targetAgent.id is the ID of the agent profile they are trying to view
         .context({ requester: requester.agent_id, owner: targetAgentId }) 
         .execute('readAllProperties')
         .sync()
