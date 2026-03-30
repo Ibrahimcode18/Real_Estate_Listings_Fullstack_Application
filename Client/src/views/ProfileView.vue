@@ -30,10 +30,10 @@
         <a-card title="Agent Information" style="margin-top: 20px;" v-if="userStore.user.agent_id">
             <a-form :model="agentDraftState" layout="vertical" @finish="onAgentSave">
                 
-                <a-form-item label="Agency Name" name="agency_name">
-                    <a-input v-model:value="agentDraftState.agency_name" />
+                <a-form-item label="Agency Name" name="agency_name" :rules="[{ required: true }]">
+                    <a-input v-model:value="agentDraftState.agency_name"  />
                 </a-form-item>
-                <a-form-item label="Phone Number" name="phone_number">
+                <a-form-item label="Phone Number" name="phone_number" :rules="[{ required: true }]">
                     <a-input v-model:value="agentDraftState.phone_number" />
                 </a-form-item>
                 <a-form-item label="License Number" name="license_number">
