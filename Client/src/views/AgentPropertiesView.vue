@@ -58,9 +58,7 @@
         }
 
         try {
-            // Fetch properties belonging ONLY to the logged-in agent.
-            // Adjust the URL if your backend uses a different route (e.g., /api/v1/agents/me/properties)
-            const response = await fetch(`http://localhost:3000/api/v1/properties?agent_id=${userStore.user.agent_id}`, {
+            const response = await fetch(`http://localhost:3000/api/v1/agents/${userStore.user.agent_id}/properties`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}` // Secure request
                 }
