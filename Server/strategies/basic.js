@@ -11,12 +11,12 @@ const verifyPassword = function (user, password) {
 
 const checkUserAndPass = async (username, password, done) => {
     try {
-        // 1. Look up the user in the DB
+        // Look up the user in the DB
         const result = await users.findByUsername(username);
         
         if (result.length) {
             const user = result[0];
-            // 2. Check the password
+            // Check the password
             if (verifyPassword(user, password)) {
                 console.log(`Successfully authenticated user ${username}`);
                 return done(null, user); // Success! Pass the user object to the route
