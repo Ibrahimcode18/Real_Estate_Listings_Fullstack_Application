@@ -67,6 +67,11 @@ async function createProperty(ctx) {
         }
 
         const agent = await agentModel.getById(agentId);
+        if (!agent.length) {
+            ctx.status = 403;
+            ctx.body = { message: "Forbidden: You must have an agent profile to create a property." };
+            return;
+        }
         const isAgentApproved = agent[0].is_approved;
         if (isAgentApproved === 0){
             ctx.status = 403;
@@ -112,13 +117,13 @@ async function getById(ctx){
         if(data.length) {
             const property = data[0];
             const user = ctx.state.user; // Might be undefined if guest
-            // 1. Base HATEOAS Links (Everyone gets these)
+            //  Base HATEOAS Links (Everyone gets these)
             property.links = {
                 self: `http://${ctx.host}${prefix}/${property.id}`,
             };
-            // 2. Dynamic RBAC Links
+            //  Dynamic RBAC Links
             if (user) {
-                // Check permissions using the ACL rules defined in Part 1
+                // Check permissions using the ACL rules 
                 const updatePermission = can.update(user, property);
                 const deletePermission = can.delete(user, property);
                 // If the ACL says yes, add the links!
