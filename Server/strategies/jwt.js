@@ -1,6 +1,6 @@
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
-const users = require('../models/users'); // Your Week 6 user model
+const users = require('../models/users'); 
 
 // In a real app, this MUST be in a .env file!
 const secretKey = 'my_super_secure_secret_key_123';
