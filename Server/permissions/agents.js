@@ -75,7 +75,7 @@ exports.update = (requester, targetAgent) => {
     
     return ac
         .can(requester.role)
-        .context({ requester: requester.id, owner: targetAgent.id }) 
+        .context({ requester: requester.agent_id, owner: targetAgent.id }) 
         .execute('update')
         .sync()
         .on('agent');
