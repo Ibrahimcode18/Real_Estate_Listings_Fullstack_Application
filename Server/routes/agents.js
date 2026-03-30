@@ -25,6 +25,12 @@ async function createAgent(ctx) {
     body.is_approved = 0; // New agents are not approved by default
     body.user_id = ctx.state.user.id;
     try {
+        const data = await model.getByUserId(body.user_id);
+        if (data.length) {
+            ctx.status = 400;
+            ctx.body = { message: "You have already created an agent profile." };
+            return;
+        }
         const result = await model.add(body);
         if (result.affectedRows) {
             const id = result.insertId;
