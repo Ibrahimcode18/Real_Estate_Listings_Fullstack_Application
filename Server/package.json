@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js",
+    "test": "cross-env NODE_ENV=test jest --forceExit --runInBand"
   },
   "keywords": [],
   "author": "",
@@ -20,11 +21,18 @@
     "koa-bodyparser": "^4.4.1",
     "koa-passport": "^6.0.0",
     "koa-router": "^14.0.0",
+    "koa2-swagger-ui": "^5.12.0",
     "mime-types": "^3.0.2",
     "mysql2": "^3.19.0",
     "passport-http": "^0.3.0",
     "passport-jwt": "^4.0.1",
     "role-acl": "^4.5.4",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "jest": "^30.3.0",
+    "supertest": "^7.2.2"
   }
 }
