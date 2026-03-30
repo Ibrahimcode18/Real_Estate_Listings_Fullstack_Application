@@ -143,7 +143,7 @@ onMounted(() => {
             </a-page-header>
 
             <img 
-                :src="property.imageURL || 'https://picsum.photos/1000/500'" 
+                :src="property.image_url || 'https://picsum.photos/1000/500'" 
                 style="width: 100%; height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 24px;"
             />
 
