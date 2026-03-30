@@ -63,7 +63,7 @@ describe('Users API Endpoints', () => {
             expect(response.status).toBe(200);
             expect(Array.isArray(response.body)).toBe(true);
             
-            // Security Check: Ensure passwords are not leaked!
+            // Security Check: Ensure passwords are not leaked
             expect(response.body[0]).not.toHaveProperty('password_hash');
             expect(response.body[0]).not.toHaveProperty('password');
         });
@@ -127,7 +127,7 @@ describe('Users API Endpoints', () => {
             expect(response.status).toBe(401); 
         });
 
-        // The Happy Path (Success)
+        // Success
         it('should return 200 OK and a JWT token for valid credentials', async () => {
             const response = await request(app.callback())
                 .post('/api/v1/users/login')

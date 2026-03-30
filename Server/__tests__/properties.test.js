@@ -21,7 +21,7 @@ describe('Properties API Endpoints', () => {
         approvedAgentToken = generateToken({ ID: 3, role: 'agent', agent_id: 1 });
     });
 
-    // Test 1: Get all properties
+    //  Get all properties
     describe('GET /api/v1/properties', () => {
         
         it('should return 200', async () => {
@@ -39,7 +39,7 @@ describe('Properties API Endpoints', () => {
     // BY ID
     describe('GET /api/v1/properties/:id', () => {
 
-        //(Success)
+        // Success
         it('should return 200 and the correct property for a valid ID', async () => {
             const response = await request(app.callback())
                 .get('/api/v1/properties/1') 
@@ -126,7 +126,7 @@ describe('Properties API Endpoints', () => {
             expect(response.body.message).toMatch(/Invalid locationId/i);
         });
 
-        //  Happy Path: Success
+        // Success
         it('should return 201 Created when an approved agent submits valid data', async () => {
             const response = await request(app.callback())
                 .post('/api/v1/properties')
@@ -166,7 +166,7 @@ describe('Properties API Endpoints', () => {
             expect(response.status).toBe(403);
         });
 
-        // The Happy Path: Success
+        // Success
         it('should return 200 OK when the correct agent updates their property', async () => {
             const response = await request(app.callback())
                 .put('/api/v1/properties/1')
@@ -199,7 +199,7 @@ describe('Properties API Endpoints', () => {
             expect(response.status).toBe(404);
         });
 
-        // The Happy Path: Success
+        // Success
         it('should return 200 OK when the correct agent deletes the property', async () => {
             const response = await request(app.callback())
                 .delete('/api/v1/properties/3') 

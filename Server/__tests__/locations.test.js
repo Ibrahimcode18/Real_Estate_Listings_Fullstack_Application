@@ -42,7 +42,7 @@ describe('Locations API Endpoints', () => {
             expect(response.status).toBe(401);
         });
 
-        // Happy Path
+        // Success Path
         it('should return 200 and a list of properties for a valid location', async () => {
             const response = await request(app.callback())
                 .get('/api/v1/locations/2/properties') 
@@ -99,7 +99,7 @@ describe('Locations API Endpoints', () => {
             expect(response.status).toBe(403);
         });
 
-        // Happy Path
+        // Success Path
         it('should return 201 Created when an Admin submits valid data', async () => {
             const response = await request(app.callback())
                 .post('/api/v1/locations')
