@@ -56,7 +56,7 @@ async function getAll(ctx) {
         const results = await model.getAll();
         ctx.body = results.map(u => {
             const user = { ...u };
-            delete user.password;
+            delete user.password;   // This is the hashed password so we never want to send it back to the client.
             user.links = {
                 self: `http://${ctx.host}${prefix}/${user.id}`
             }
@@ -93,7 +93,7 @@ async function getById(ctx) {
             return;
         }
 
-        // IMPORTANT: Never send the password back, even the hash!
+        // IMPORTANT: This is the hashed password so we never want to send it back to the client.
         delete user.password;
         user.links = {
             self: `http://${ctx.host}${prefix}/${user.id}`,
