@@ -102,7 +102,7 @@ async function getById(ctx) {
     }
 }
 
-async function getPropertiesById(ctx) {//COMING BACK
+async function getPropertiesById(ctx) {
     const agentId = Number(ctx.params.id);
     if (isNaN(agentId) || !Number.isInteger(agentId) || agentId <= 0) {
         ctx.status = 400;
@@ -111,7 +111,7 @@ async function getPropertiesById(ctx) {//COMING BACK
     }
 
     try{
-        const permission = can.readAllProperties(ctx.state.user, agentId);  /// COMING BACK
+        const permission = can.readAllProperties(ctx.state.user, agentId); 
         if (!permission.granted) {
             ctx.status = 403;
             ctx.body = { message: "Forbidden: You do not own these properties." };
