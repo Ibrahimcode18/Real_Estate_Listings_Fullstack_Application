@@ -1,12 +1,12 @@
 const AccessControl = require('role-acl');
 const ac = new AccessControl();
 
-// --- 1. THE ADMIN ---
+
 // Admins can do anything to any property (No conditions)
+ac.grant('admin').execute('create').on('property');
 ac.grant('admin').execute('update').on('property');
 ac.grant('admin').execute('delete').on('property');
-
-// --- 2. THE AGENT ---
+ 
 // Agents can update and delete, but ONLY if they own it
 ac.grant('agent')
     .condition({ Fn: 'EQUALS', args: { 'requester': '$.owner' } })
@@ -18,11 +18,11 @@ ac.grant('agent')
     .execute('delete')
     .on('property');
 
-// --- 3. THE USER ---
+// Users can only read properties, no conditions
 ac.grant('user').execute('read').on('property');
 
 
-// --- CHECKER FUNCTIONS ---
+
 exports.update = (requester, data) => {
     if (!ac.hasRole(requester.role)) return { granted: false };
 
