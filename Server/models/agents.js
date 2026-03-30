@@ -19,7 +19,11 @@ exports.getAll = async function getAll () {
 }
 
 exports.getPropertiesById = async function getPropertiesById (agentId) {
-    const query = "SELECT * FROM properties WHERE agent_id = ?;";
+    const query = `
+        SELECT properties.*, locations.city AS location 
+        FROM properties 
+        JOIN locations ON properties.location_id = locations.id
+        WHERE properties.agent_id = ?`;
     const data = await db.run_query(query, [agentId]);
     return data;
 }
