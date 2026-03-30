@@ -1,4 +1,4 @@
-This Repository Contains A real estate listings Application and Automated Backend Tests.
+This repository contains a real estate listings Application and Automated Backend Tests.
 
 To run the Application:
 1. Run the 'realestate_listings.sql' script
@@ -10,28 +10,28 @@ To run the tests:
 2. While in the Server directory, run npx jest
 
 //// The following are the user login details and roles for the Application
-1. Admin:
-username: Ade
-password: Bob2@gmail.com
+**1. Admin:**
+**Username:** Ade
+**Password:** Bob2@gmail.com
 
-2. Approved Agents:
+2. **Approved Agents:**
 
-username: janedoe
-password: jane@elitehomes
+**Username**: janedoe
+**Password**: jane@elitehomes
 
-username: KylianMbappe
-password: KylianMbappe
+**Username**: KylianMbappe
+**Password:** KylianMbappe
 
-username: Ronaldo
-password: ronaldoatgmail
+**Username:** Ronaldo
+**Password**: ronaldoatgmail
 
-3. Unapproved Agents:
-username: fedeValverde
-password: fedeValverde
+**3. Unapproved Agents:**
+**Username:** fedeValverde
+**Password:** fedeValverde
 
-username: newuser
-password: newuser123
+**Username:** newuser
+**Password:** newuser123
 
-4. Normal User
-username: bob
-password: 
+**4. Normal User**
+**Username**: bob
+**Password:** 
