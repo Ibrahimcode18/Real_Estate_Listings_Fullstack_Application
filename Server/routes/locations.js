@@ -21,7 +21,7 @@ const optionalAuth = (ctx, next) => {
 router.get('/', optionalAuth, getAll);
 router.post('/', auth.requireJWT, bodyParser(), validateLocation, createLocation);
 router.get('/:id/properties', auth.requireJWT, getPropertiesById);
-router.put('/:id', auth.requireJWT, bodyParser(), validateLocationUpdate, updateLocation); // Create a validateLocationUpdate schema
+router.put('/:id', auth.requireJWT, bodyParser(), validateLocationUpdate, updateLocation);
 router.delete('/:id', auth.requireJWT, deleteLocation);
 
 
@@ -29,13 +29,11 @@ router.delete('/:id', auth.requireJWT, deleteLocation);
 // Handlers
 async function getAll(ctx) {
     const user = ctx.state.user;
-    console.log(user);
     try{
         const data = await model.getAll();
         if (data.length) {
             ctx.body = data.map(location => {
                 const { id, city, image_url } = location;
-                console.log(location);
                 const links = {
                     self: `http://${ctx.host}${prefix}/${id}/properties`
                 }
