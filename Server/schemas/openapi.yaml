@@ -1,0 +1,607 @@
+openapi: 3.0.0
+info:
+  title: Real Estate Listings API
+  description: A fully secured, role-based API for managing real estate properties, locations, agents, and users.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local Development Server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Enter your JWT token here to access protected routes.
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Used ONLY for the /users/login endpoint.
+
+paths:
+  /users/login:
+    post:
+      summary: Login to get a JWT
+      tags:
+        - Users & Authentication
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Login successful, returns JWT
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Login successful
+                  token:
+                    type: string
+                  user:
+                    type: object
+        '401':
+          description: Unauthorized - Invalid credentials
+
+  /users:
+    post:
+      summary: Register a new user
+      tags:
+        - Users & Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, email, password]
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+      responses:
+        '201':
+          description: User created successfully
+        '400':
+          description: Validation Error (Bad JSON)
+        '409':
+          description: Username or Email already exists
+
+    get:
+      summary: Get all users (Admin only)
+      tags:
+        - Users & Authentication
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A list of users
+        '401':
+          description: Missing or invalid JWT
+        '403':
+          description: Forbidden - Requires Admin role
+  /users/{id}:
+    get:
+      summary: Get a user by ID
+      tags:
+        - Users & Authentication
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the user
+      responses:
+        '200':
+          description: User profile data retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  username:
+                    type: string
+                  email:
+                    type: string
+                  role:
+                    type: string
+        '400':
+          description: Invalid User ID format
+        '403':
+          description: Forbidden - Cannot view another user's profile
+        '404':
+          description: User not found
+
+    put:
+      summary: Update a user's profile
+      tags:
+        - Users & Authentication
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the user to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Only include the fields you want to update.
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: User updated successfully
+        '400':
+          description: Invalid User ID or Bad Request
+        '403':
+          description: Forbidden - Cannot update another user's profile
+        '404':
+          description: User not found
+
+  /properties:
+    get:
+      summary: Get all properties
+      tags:
+        - Properties
+      responses:
+        '200':
+          description: A list of all properties retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                    price:
+                      type: number
+                    listing_type:
+                      type: string
+
+    post:
+      summary: Create a new property
+      tags:
+        - Properties
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, listing_type, price, location_id]
+              properties:
+                title:
+                  type: string
+                  example: "Beautiful New Test House"
+                description:
+                  type: string
+                listing_type:
+                  type: string
+                  enum: [rent, sale]
+                  example: "sale"
+                price:
+                  type: number
+                  example: 500000.00
+                location_id:
+                  type: integer
+                  example: 1
+      responses:
+        '201':
+          description: Property created successfully
+        '400':
+          description: Bad Request (Invalid input or foreign key)
+        '401':
+          description: Unauthorized - Missing JWT token
+        '403':
+          description: Forbidden - Must be an approved agent
+
+  /properties/{id}:
+    get:
+      summary: Get a property by ID
+      tags:
+        - Properties
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the property
+      responses:
+        '200':
+          description: Property details retrieved successfully
+        '400':
+          description: Invalid Property ID format
+        '404':
+          description: Property not found
+
+    put:
+      summary: Update a property
+      tags:
+        - Properties
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                price:
+                  type: number
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Property updated successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Must be the agent who owns this property
+        '404':
+          description: Property not found
+
+    delete:
+      summary: Delete a property
+      tags:
+        - Properties
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Property deleted successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Must be the agent who owns this property
+        '404':
+          description: Property not found
+  
+  /agents:
+    get:
+      summary: Get all agents (Admin only)
+      tags:
+        - Agents
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A list of all agents
+        '401':
+          description: Unauthorized - Missing JWT token
+        '403':
+          description: Forbidden - Only admins can view all agents
+
+    post:
+      summary: Create an agent profile
+      description: Logged-in users can create an agent profile. It defaults to unapproved.
+      tags:
+        - Agents
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agency_name, phone_number, license_number]
+              properties:
+                agency_name:
+                  type: string
+                  example: "Prime Estates UK"
+                phone_number:
+                  type: string
+                  example: "07123456789"
+                license_number:
+                  type: string
+                  example: "LIC-TEST-001"
+      responses:
+        '201':
+          description: Agent profile created successfully
+        '400':
+          description: Validation Error (Bad JSON data)
+        '401':
+          description: Unauthorized
+
+  /agents/{id}:
+    get:
+      summary: Get an agent by ID
+      tags:
+        - Agents
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Agent data retrieved successfully
+        '400':
+          description: Invalid Agent ID
+        '403':
+          description: Forbidden - Cannot view this agent
+        '404':
+          description: Agent not found
+
+    put:
+      summary: Update an agent profile
+      tags:
+        - Agents
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agency_name:
+                  type: string
+                phone_number:
+                  type: string
+      responses:
+        '200':
+          description: Agent updated successfully
+        '403':
+          description: Forbidden - Can only update your own profile
+        '404':
+          description: Agent not found
+
+  /agents/{id}/properties:
+    get:
+      summary: Get all properties owned by an agent
+      tags:
+        - Agents
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of properties owned by the agent
+        '403':
+          description: Forbidden - Can only view your own property list
+        '404':
+          description: No properties found for this agent
+
+  /agents/{id}/approve:
+    patch:
+      summary: Approve an agent (Admin only)
+      tags:
+        - Agents
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Agent approved successfully
+        '403':
+          description: Forbidden - Only admins can perform this action
+        '404':
+          description: Agent not found
+
+  /agents/{id}/suspend:
+    patch:
+      summary: Suspend an agent (Admin only)
+      tags:
+        - Agents
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Agent suspended successfully
+        '403':
+          description: Forbidden - Only admins can perform this action
+        '404':
+          description: Agent not found
+  
+  /locations:
+    get:
+      summary: Get all locations
+      tags:
+        - Locations
+      responses:
+        '200':
+          description: A list of all supported real estate locations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    city:
+                      type: string
+                    image_url:
+                      type: string
+                      format: uri
+
+    post:
+      summary: Create a new location (Admin only)
+      tags:
+        - Locations
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [city, image_url]
+              properties:
+                city:
+                  type: string
+                  example: "Birmingham"
+                image_url:
+                  type: string
+                  format: uri
+                  example: "http://example.com/birmingham.jpg"
+      responses:
+        '201':
+          description: Location created successfully
+        '400':
+          description: Validation Error (e.g., image_url is not a valid URI)
+        '401':
+          description: Unauthorized - Missing JWT token
+        '403':
+          description: Forbidden - Only admins can create locations
+
+  /locations/{id}:
+    put:
+      summary: Update a location (Admin only)
+      tags:
+        - Locations
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the location to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                city:
+                  type: string
+                image_url:
+                  type: string
+                  format: uri
+      responses:
+        '200':
+          description: Location updated successfully
+        '400':
+          description: Invalid Location ID or Validation Error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Only admins can update locations
+        '404':
+          description: Location not found
+
+    delete:
+      summary: Delete a location (Admin only)
+      tags:
+        - Locations
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the location to delete
+      responses:
+        '200':
+          description: Location deleted successfully
+        '400':
+          description: Invalid Location ID
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Only admins can delete locations
+        '404':
+          description: Location not found
+
+  /locations/{id}/properties:
+    get:
+      summary: Get all properties in a specific location
+      tags:
+        - Locations
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the location
+      responses:
+        '200':
+          description: A list of properties within the specified location
+        '400':
+          description: Invalid Location ID format
+        '401':
+          description: Unauthorized - Missing JWT token
+        '404':
+          description: No properties found for this location
