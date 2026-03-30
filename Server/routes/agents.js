@@ -46,7 +46,7 @@ async function getAll(ctx) {
             ctx.body = { message: "Forbidden: Only admins can view all agents." };
             return;
         }
-
+        
         const results = await model.getAll();
         ctx.body = results.map( a => {
             const agent = { ...a };
@@ -121,13 +121,12 @@ async function getPropertiesById(ctx) {
         const data = await model.getPropertiesById(agentId);
         if (data.length) {
             ctx.body = data.map(post => {
-                const { id, title, description, imageURL } = post;
+                const { id, title, description, listing_type, price, location, image_url } = post;
                 
                 const links = {
                     self: `http://${ctx.host}/api/v1/properties/${id}`
                 }
-
-                return { id, title, description, imageURL, links };
+                return { id, title, description, listing_type, price, location, image_url, links };
             });
 
         } else {
@@ -229,7 +228,7 @@ async function suspendAgent(ctx){
     }
 
     try{
-        const permission = can.approve(ctx.state.user);
+        const permission = can.suspend(ctx.state.user);
         if (!permission.granted) {
             ctx.status = 403;
             ctx.body = { message: "Forbidden: Only admins can perform this action." };
@@ -242,7 +241,11 @@ async function suspendAgent(ctx){
             ctx.body = { message: "Agent not found." };
             return;
         }
-
+        if (ctx.state.user.agent_id === id){
+            ctx.status = 403;
+            ctx.body = { message: "Forbidden: You cannot suspend yourself." };
+            return;
+        }
         const result1 = await model.suspend(id);
         if (result1.affectedRows){
             ctx.status = 200;
