@@ -141,6 +141,9 @@
                 if (agent) {
                     agent.is_approved = 0; 
                 }
+            } else if (res.status === 403) {
+                const data = await res.json();
+                alert(data.message);
             }
         } catch (e) { 
             console.error(e); 
