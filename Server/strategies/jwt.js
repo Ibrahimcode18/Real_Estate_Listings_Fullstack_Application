@@ -1,9 +1,10 @@
+require('dotenv').config(); // Load environment variables from .env file
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const users = require('../models/users'); 
 
 // In a real app, this MUST be in a .env file!
-const secretKey = 'my_super_secure_secret_key_123';
+const secretKey = process.env.JWT_SECRET;
 
 const opts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
