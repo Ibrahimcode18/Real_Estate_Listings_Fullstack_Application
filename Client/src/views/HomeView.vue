@@ -23,8 +23,8 @@
   <div v-if="loading">Loading...</div>
 
   <a-row :gutter="[16, 16]" v-else>
-      <a-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" v-for="property in properties" :key="property.id">
-        <router-link :to="`properties/${property.id}`">
+      <a-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" v-for="property in properties" :key="property.id" class="property-col">
+        <router-link :to="`/properties/${property.id}`" class="property-link">
           <PropertyCard
               :title="property.title"
               :location="property.location"
@@ -32,7 +32,19 @@
               :imageURL="property.image_url"
               :listing_type="property.listing_type"
           />
-      </router-link>
+        </router-link>
       </a-col>
   </a-row>
 </template>
+
+<style scoped>
+.property-col {
+  display: flex;
+}
+
+.property-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+</style>

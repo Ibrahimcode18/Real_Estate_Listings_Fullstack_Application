@@ -13,7 +13,7 @@ import { ref } from 'vue'
 
 </script>
 <template>
-    <a-card hoverable style="width: 300px; overflow: hidden;">
+    <a-card hoverable class="location-card">
         <template #cover>
             <div style="position: relative; height: 200px;">
                 <img :alt="name" :src="imageURL || 'https://picsum.photos/300/200'" 
@@ -28,15 +28,21 @@ import { ref } from 'vue'
 </template>
 
 <style scoped>
-    .location-name{
-        position: absolute; 
-        bottom: 0px; 
-        text-align: center;
-        width: 100%; 
-        padding: 10px 15px; 
-        color: white; 
-        font-weight: bold; 
-        font-size: 1.5rem;
-        background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-    }
+.location-card {
+    width: 100%;
+    max-width: 300px;
+    overflow: hidden;
+}
+
+.location-name {
+    position: absolute; 
+    bottom: 0px; 
+    text-align: center;
+    width: 100%; 
+    padding: 10px 15px; 
+    color: white; 
+    font-weight: bold; 
+    font-size: 1.5rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+}
 </style>

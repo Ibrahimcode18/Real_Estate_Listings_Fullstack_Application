@@ -15,7 +15,7 @@ import { ref } from 'vue'
 
 </script>
 <template>
-    <a-card hoverable style="width: 300px">
+    <a-card hoverable class="property-card">
         <template #cover>
             <img :alt="title" :src="imageURL || 'https://picsum.photos/300/200'" />
         </template>
@@ -35,9 +35,23 @@ import { ref } from 'vue'
                     <span style="font-size: 1.1rem; font-weight: bold; color: black;">
                         £{{ price ? price: '0' }}
                     </span>
-                
                 </div>
             </template>
         </a-card-meta>
     </a-card>
 </template>
+
+<style scoped>
+.property-card {
+    width: 100%;
+    max-width: 300px;
+    height: 100%;
+}
+
+.property-card :deep(img) {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+}
+</style>

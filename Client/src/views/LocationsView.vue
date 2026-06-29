@@ -73,8 +73,8 @@
     <div v-if="loading">Loading...</div>
 
     <a-row :gutter="[16, 16]" v-else>
-        <a-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" v-for="location in locations" :key="location.id">
-            <router-link :to="`locations/${location.id}?name=${location.city}`">
+        <a-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" v-for="location in locations" :key="location.id" class="location-item">
+            <router-link :to="`/locations/${location.id}?name=${location.city}`" class="location-link">
                 <LocationCard
                     :name="location.city"
                     :imageURL="location.imageURL"
@@ -99,3 +99,16 @@
       @saved="handleLocationSaved"
     />
 </template>
+
+<style scoped>
+.location-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.location-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+</style>
