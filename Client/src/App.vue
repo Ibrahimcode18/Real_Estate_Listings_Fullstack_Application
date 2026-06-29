@@ -46,7 +46,7 @@
       </div>
     </a-layout-content>
     <a-layout-footer style="text-align: center">
-      Web API Development ©2026 Created by Me
+      Web Development ©2026 Created by Ibrahimcode18
     </a-layout-footer>
   </a-layout>
 </template>
