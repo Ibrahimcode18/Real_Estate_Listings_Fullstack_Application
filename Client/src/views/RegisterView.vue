@@ -12,7 +12,6 @@
     const onFinish = async (values) => {
         loading.value = true;
         try {
-            // Send data to Week 6 Backend
             const response = await fetch('http://localhost:3000/api/v1/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -42,7 +41,9 @@
                 <a-form-item label="Email" name="email" :rules="[{ required: true, type: 'email' }]">
                     <a-input v-model:value="formState.email" />
                 </a-form-item>
-                <a-form-item label="Password" name="password" :rules="[{ required: true }]">
+                <a-form-item label="Password" name="password" :rules="[{ required: true, message: 'Please input your password!'},
+                    { min: 8, message: 'Password must be at least 8 characters long!' }
+                ]">
                     <a-input-password v-model:value="formState.password" />
                 </a-form-item>
                 <a-form-item>
