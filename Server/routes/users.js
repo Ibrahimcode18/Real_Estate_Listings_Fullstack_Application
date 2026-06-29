@@ -124,7 +124,8 @@ async function loginUser(ctx) {
     };
     
     // Sign the token (Must match the secret in strategies/jwt.js)
-    const token = jwt.sign(payload, 'my_super_secure_secret_key_123', { expiresIn: '1h' });
+    const jwtSecret = process.env.JWT_SECRET || 'my_super_secure_secret_key_123';
+    const token = jwt.sign(payload, jwtSecret, { expiresIn: '1h' });
     ctx.status = 200;
     ctx.body = {
         message: "Login successful",
