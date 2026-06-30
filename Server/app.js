@@ -2,7 +2,7 @@ const Koa = require('koa');
 const cors = require('@koa/cors');
 const app = new Koa();
 const { koaBody } = require('koa-body');
-
+const passport = require('koa-passport');
 const { koaSwagger } = require('koa2-swagger-ui');
 const yaml = require('yamljs');
 
@@ -25,6 +25,7 @@ app.use(koaBody({
 app.use(koaSwagger({ routePrefix: '/api/v1/docs', swaggerOptions: { spec } }));
 
 app.use(cors());
+app.use(passport.initialize());
 app.use(properties.routes());
 app.use(users.routes());
 app.use(locations.routes());
