@@ -42,6 +42,7 @@
     import { useRouter } from 'vue-router';
     import { useUserStore } from '@/stores/user';
     import PropertyCard from '@/components/PropertyCard.vue';
+    import { API_BASE_URL } from '@/services/api';
 
     const router = useRouter();
     const userStore = useUserStore();
@@ -58,7 +59,7 @@
         }
 
         try {
-            const response = await fetch(`http://localhost:3000/api/v1/agents/${userStore.user.agent_id}/properties`, {
+            const response = await fetch(`${API_BASE_URL}/api/v1/agents/${userStore.user.agent_id}/properties`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}` // Secure request
                 }

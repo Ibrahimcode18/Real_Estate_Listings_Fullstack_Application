@@ -1,8 +1,4 @@
 <script setup>
-import { Card } from 'ant-design-vue';
-import { Tag } from 'ant-design-vue';
-import { LikeOutlined, MessageOutlined, LikeFilled } from '@ant-design/icons-vue';
-import { ref } from 'vue'
 
 // Define what data this component EXPECTS to receive
     defineProps({

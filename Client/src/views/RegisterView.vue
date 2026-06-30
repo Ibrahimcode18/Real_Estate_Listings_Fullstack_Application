@@ -1,6 +1,8 @@
 <script setup>
     import { reactive, ref } from 'vue';
     import { useRouter } from 'vue-router';
+    import { API_BASE_URL } from '@/services/api';
+
     const router = useRouter(); // To redirect user after success
     const loading = ref(false);
     // Reactive object to hold form data
@@ -12,7 +14,7 @@
     const onFinish = async (values) => {
         loading.value = true;
         try {
-            const response = await fetch('http://localhost:3000/api/v1/users', {
+            const response = await fetch(`${API_BASE_URL}/api/v1/users`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(values)

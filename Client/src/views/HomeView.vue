@@ -1,13 +1,14 @@
 <script setup>
   import { ref, onMounted } from 'vue'
   import PropertyCard from '@/components/PropertyCard.vue'
+  import { API_BASE_URL } from '@/services/api';
 
   const properties = ref([])
   const loading = ref(true)
 
   onMounted(async () => {
       try {
-          const res = await fetch('http://localhost:3000/api/v1/properties')
+          const res = await fetch(`${API_BASE_URL}/api/v1/properties`)
           const data = await res.json()
           console.log(data);
           properties.value = data

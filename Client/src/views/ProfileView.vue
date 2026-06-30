@@ -54,7 +54,8 @@
 <script setup>
     import { reactive, ref, onMounted } from 'vue';
     import { useUserStore } from '@/stores/user';
-    import { useRouter } from 'vue-router'; 
+    import { useRouter } from 'vue-router';
+    import { API_BASE_URL } from '@/services/api';
     
     const userStore = useUserStore();
     const isSaving = ref(false);
@@ -77,9 +78,8 @@
 
     onMounted(async () => {
         try {
-            const response = await fetch(`http://localhost:3000/api/v1/users/${userStore.user.ID}`, {
+            const response = await fetch(`${API_BASE_URL}/api/v1/users/${userStore.user.ID}`, {
                 headers: {
-                    // Don't forget to send your JWT so the backend knows you have permission!
                     'Authorization': `Bearer ${localStorage.getItem('token')}` 
                 }
             });
@@ -100,7 +100,7 @@
 
         if (userStore.user.agent_id) {
             try {
-                const agentResponse = await fetch(`http://localhost:3000/api/v1/agents/${userStore.user.agent_id}`, {
+                const agentResponse = await fetch(`${API_BASE_URL}/api/v1/agents/${userStore.user.agent_id}`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}` 
                     }
@@ -128,7 +128,7 @@
         if (draftState.first_name) cleanPayload.first_name = draftState.first_name;
         if (draftState.last_name) cleanPayload.last_name = draftState.last_name;
         try {
-            const response = await fetch(`http://localhost:3000/api/v1/users/${userStore.user.ID}`, {
+            const response = await fetch(`${API_BASE_URL}/api/v1/users/${userStore.user.ID}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -166,7 +166,7 @@
         };
 
         try {
-            const response = await fetch(`http://localhost:3000/api/v1/agents/${userStore.user.agent_id}`, {
+            const response = await fetch(`${API_BASE_URL}/api/v1/agents/${userStore.user.agent_id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

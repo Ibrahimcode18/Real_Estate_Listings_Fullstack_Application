@@ -17,6 +17,7 @@
 
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
+import { API_BASE_URL } from '@/services/api';
 
 const props = defineProps({
   open: Boolean,
@@ -59,8 +60,8 @@ const handleSubmit = async () => {
   isSubmitting.value = true
   
   const url = isEditing.value 
-      ? `http://localhost:3000/api/v1/locations/${props.initialData.id}` 
-      : 'http://localhost:3000/api/v1/locations'
+      ? `${API_BASE_URL}/api/v1/locations/${props.initialData.id}` 
+      : `${API_BASE_URL}/api/v1/locations`
   const method = isEditing.value ? 'PUT' : 'POST'
 
   try {

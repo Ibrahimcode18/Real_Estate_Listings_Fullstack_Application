@@ -3,6 +3,7 @@
     import { useUserStore } from '@/stores/user';  
     import LocationCard from '@/components/LocationCard.vue';
     import LocationModal from '@/components/LocationModal.vue';
+    import { API_BASE_URL } from '@/services/api';
 
     const locations = ref([])
     const loading = ref(true)
@@ -13,7 +14,7 @@
 
     onMounted(async () => {
         try {
-            const res = await fetch('http://localhost:3000/api/v1/locations')
+            const res = await fetch(`${API_BASE_URL}/api/v1/locations`)
             const data = await res.json()
             console.log(data);
             locations.value = data
@@ -46,7 +47,7 @@
     const handleDeleteLocation = async (id) => {
         if (confirm('Are you sure you want to delete this location?')) {
             try {
-                const res = await fetch(`http://localhost:3000/api/v1/locations/${id}`, {
+                const res = await fetch(`${API_BASE_URL}/api/v1/locations/${id}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 })

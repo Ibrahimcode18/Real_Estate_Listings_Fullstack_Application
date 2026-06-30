@@ -2,17 +2,17 @@
     import { ref, onMounted } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
     import { PhoneOutlined, IdcardOutlined } from '@ant-design/icons-vue';
-
+    import { API_BASE_URL } from '@/services/api';
+    
     const route = useRoute();
     const router = useRouter();
     const agencyId = route.params.id;
 
     const agency = ref(null);
     const loading = ref(true);
-
     const fetchAgencyDetails = async () => {
         try {
-            const response = await fetch(`http://localhost:3000/api/v1/agents/${agencyId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/v1/agents/${agencyId}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}` 
                 }

@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PropertyCard from '@/components/PropertyCard.vue'; // Make sure this path is correct
+import { API_BASE_URL } from '@/services/api';
 
 const route = useRoute();
 const router = useRouter();
@@ -12,7 +13,7 @@ const locationName = route.query.name;
 const fetchPropertiesByLocation = async () => {
     const locationId = route.params.id;
     try {
-        const response = await fetch(`http://localhost:3000/api/v1/locations/${locationId}/properties`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/locations/${locationId}/properties`, {
             headers: {
                 // Don't forget to send your JWT so the backend knows you have permission!
                 'Authorization': `Bearer ${localStorage.getItem('token')}` 

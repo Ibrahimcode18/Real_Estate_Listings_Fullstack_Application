@@ -3,6 +3,7 @@ import { ref, computed, reactive, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { MessageOutlined, DeleteOutlined } from '@ant-design/icons-vue';
 import { useUserStore } from '@/stores/user';
+import { API_BASE_URL } from '@/services/api';
 
 const route = useRoute();
 const router = useRouter();
@@ -28,7 +29,7 @@ const canEdit = computed(() => {
 
 const fetchLocations = async () => {
     try {
-        const response = await fetch('http://localhost:3000/api/v1/locations');
+        const response = await fetch(`${API_BASE_URL}/api/v1/locations`);
         if (response.ok) locations.value = await response.json();
     } catch (error) {
         console.error('Error fetching locations:', error);
@@ -38,7 +39,7 @@ const fetchLocations = async () => {
 const fetchPropertyDetails = async () => {
     const propertyId = route.params.id;
     try {
-        const response = await fetch(`http://localhost:3000/api/v1/properties/${propertyId}`);
+        const response = await fetch(`${API_BASE_URL}/api/v1/properties/${propertyId}`);
         if (response.ok) {
             property.value = await response.json();
             Object.assign(updateFormState, {
@@ -62,7 +63,7 @@ const fetchPropertyDetails = async () => {
 const onUpdate = async () => {
     isUpdating.value = true;
     try {
-        const response = await fetch(`http://localhost:3000/api/v1/properties/${property.value.id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/properties/${property.value.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -90,7 +91,7 @@ const onUpdate = async () => {
 const onDelete = async () => {
     isDeleting.value = true;
     try {
-        const response = await fetch(`http://localhost:3000/api/v1/properties/${property.value.id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/properties/${property.value.id}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`

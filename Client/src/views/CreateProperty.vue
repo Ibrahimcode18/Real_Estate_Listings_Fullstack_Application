@@ -1,7 +1,8 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { UploadOutlined } from '@ant-design/icons-vue'; 
+import { UploadOutlined } from '@ant-design/icons-vue';
+import { API_BASE_URL } from '@/services/api';
 
 const router = useRouter();
 const locations = ref([]); 
@@ -22,7 +23,7 @@ const formState = reactive({
 
 const fetchLocations = async () => {
     try {
-        const response = await fetch('http://localhost:3000/api/v1/locations');
+        const response = await fetch(`${API_BASE_URL}/api/v1/locations`);
         if (response.ok) {
             locations.value = await response.json();
         }
@@ -64,7 +65,7 @@ const onSubmit = async () => {
         const formData = new FormData();
         formData.append('upload', imageFile.value); 
 
-        const imageResponse = await fetch('http://localhost:3000/api/v1/images', {
+        const imageResponse = await fetch(`${API_BASE_URL}/api/v1/images`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -79,7 +80,7 @@ const onSubmit = async () => {
         
         // Upload property fields
         formState.image_url = finalImageUrl;
-        const propertyResponse = await fetch('http://localhost:3000/api/v1/properties', {
+        const propertyResponse = await fetch(`${API_BASE_URL}/api/v1/properties`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

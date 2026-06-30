@@ -51,6 +51,7 @@
     import TableCard from '@/components/TableCard.vue';
     import { useUserStore } from '@/stores/user';
     import { useRouter } from 'vue-router';
+    import { API_BASE_URL } from '@/services/api';
 
     const loading = ref(true);
     const rawAgents = ref([]);
@@ -95,14 +96,14 @@
         }
         try {
 
-            const agentsRes = await fetch('http://localhost:3000/api/v1/agents', {
+            const agentsRes = await fetch(`${API_BASE_URL}/api/v1/agents`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             if (agentsRes.ok) {
                 rawAgents.value = await agentsRes.json();
             }
 
-            const usersRes = await fetch('http://localhost:3000/api/v1/users', {
+            const usersRes = await fetch(`${API_BASE_URL}/api/v1/users`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             if (usersRes.ok) {
@@ -119,7 +120,7 @@
     
     const handleApprove = async (agentId) => {
         try {
-            const res = await fetch(`http://localhost:3000/api/v1/agents/${agentId}/approve`, {
+            const res = await fetch(`${API_BASE_URL}/api/v1/agents/${agentId}/approve`, {
                 method: 'PATCH', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             if (res.ok) {
@@ -133,7 +134,7 @@
 
     const handleSuspend = async (agentId) => {
         try {
-            const res = await fetch(`http://localhost:3000/api/v1/agents/${agentId}/suspend`, {
+            const res = await fetch(`${API_BASE_URL}/api/v1/agents/${agentId}/suspend`, {
                 method: 'PATCH', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             if (res.ok) {
