@@ -6,7 +6,7 @@ const { koaBody } = require('koa-body');
 const { koaSwagger } = require('koa2-swagger-ui');
 const yaml = require('yamljs');
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 const properties = require('./routes/properties.js');
 const users = require('./routes/users.js');
 const locations = require('./routes/locations.js');
