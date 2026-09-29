@@ -2,14 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
-import PropertyDetailsView from '@/views/PropertyDetailsView.vue';
+import ProfileView from '../views/ProfileView.vue'
 import LocationsView from '@/views/LocationsView.vue'
-import LocationPropertiesView from '@/views/LocationPropertiesView.vue'
 import { useUserStore } from '../stores/user';
-import AgencyProfileView from '@/views/AgencyProfileView.vue'
-import AgentFormView from '@/views/AgentFormView.vue'
-import CreateProperty from '@/views/CreateProperty.vue'
-import Dashboard from '@/views/Dashboard.vue'
 import NotFound from '@/views/NotFound.vue'
 
 const router = createRouter({
@@ -33,33 +28,33 @@ const router = createRouter({
     },
     {   path: '/locations/:id', 
         name:'locationProperties', 
-        component: () => LocationPropertiesView, 
+        component: () => import('../views/LocationPropertiesView.vue'), 
         meta: { requiresAuth: true } 
     }, 
     {   path: '/profile', 
         name: 'profile', 
-        component: () => import('../views/ProfileView.vue'), 
+        component: ProfileView,
         meta: { requiresAuth: true }
     },
     {   path: '/properties/:id', 
         name: 'PropertyDetails',
-        component: PropertyDetailsView
+        component: () => import('../views/PropertyDetailsView.vue'),
     },
     {   path: '/dashboard', 
         name: 'Dashboard', 
-        component: () => Dashboard, 
+        component: () => import('../views/Dashboard.vue'), 
         meta: { requiresAuth: true }
     },
     {
         path: '/agency/:id', 
         name: 'AgencyProfile',
-        component: () => AgencyProfileView,
+        component: () => import('../views/AgencyProfileView.vue'),
         meta: { requiresAuth: true }
     },
     { 
         path: '/agent-application', 
         name: 'AgentApplication',
-        component: () => AgentFormView,
+        component: () => import('../views/AgentFormView.vue'),
         meta: { requiresAuth: true }
     },
     {
@@ -70,7 +65,7 @@ const router = createRouter({
     },
     {   path: '/newProperty', 
         name: 'NewProperty', 
-        component: () => CreateProperty, 
+        component: () => import('../views/CreateProperty.vue'), 
         meta: { requiresAuth: true } 
     },
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound }
