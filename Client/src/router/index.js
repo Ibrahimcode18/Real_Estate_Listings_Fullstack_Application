@@ -10,6 +10,7 @@ import AgencyProfileView from '@/views/AgencyProfileView.vue'
 import AgentFormView from '@/views/AgentFormView.vue'
 import CreateProperty from '@/views/CreateProperty.vue'
 import Dashboard from '@/views/Dashboard.vue'
+import NotFound from '@/views/NotFound.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -71,7 +72,8 @@ const router = createRouter({
         name: 'NewProperty', 
         component: () => CreateProperty, 
         meta: { requiresAuth: true } 
-    }
+    },
+    { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound }
     ]
 })
 
