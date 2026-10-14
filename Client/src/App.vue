@@ -1,75 +1,137 @@
 <script setup>
-  import { RouterView, RouterLink } from 'vue-router'
-  import { useUserStore } from '@/stores/user' // Import Store
+  import { ref } from 'vue'
+  import { RouterView } from 'vue-router'
+  import { MenuOutlined } from '@ant-design/icons-vue'
+  import AppMenu from '@/components/AppMenu.vue'
 
-  const userStore = useUserStore()
+  const drawerOpen = ref(false)
 </script>
 
 <template>
   <a-layout class="layout">
-    <a-layout-header>
+    <a-layout-header class="header">
       <div class="logo">CR7 Estate Properties</div>
 
-      <a-menu theme="dark" mode="horizontal" :selectable="false">
-        <a-menu-item key="1"><RouterLink to="/">Home</RouterLink></a-menu-item>
-        <a-menu-item key="6"><RouterLink to="/locations">Locations</RouterLink></a-menu-item>
+      <AppMenu class="desktop-menu" mode="horizontal" theme="dark" />
 
-        <template v-if="userStore.user.loggedIn">
-          <template v-if="userStore.user.role === 'admin'">
-            <a-menu-item key="4"><RouterLink to="/dashboard">Dashboard</RouterLink></a-menu-item>
-          </template>
-          <template v-if="userStore.user.agent_id !== null">
-            <a-menu-item key="8"><RouterLink to="/agentproperties">My Properties</RouterLink></a-menu-item>
-          </template>
+      <a-button type="text" class="mobile-menu-btn" aria-label="Open menu" @click="drawerOpen = true">
+        <template #icon>
+          <MenuOutlined />
         </template>
-
-        <template v-if="!userStore.user.loggedIn">
-            <a-menu-item key="2" style="margin-left: auto">
-                <RouterLink to="/login">Login</RouterLink>
-            </a-menu-item>
-            <a-menu-item key="3"><RouterLink to="/register">Register</RouterLink></a-menu-item>
-        </template>
-
-        <template v-else>
-            <a-menu-item key="5" style="margin-left: auto">
-                Hello, {{ userStore.user.username }}
-            </a-menu-item>
-            <a-menu-item key="7"><RouterLink to="/profile">Profile</RouterLink></a-menu-item>
-            <a-menu-item key="9"><RouterLink to="/login" @click="userStore.logout">Logout</RouterLink></a-menu-item>
-        </template>
-    </a-menu>
+      </a-button>
     </a-layout-header>
 
-    <a-layout-content style="padding: 0 50px; margin-top: 20px">
+    <a-drawer
+      v-model:open="drawerOpen"
+      title="Menu"
+      placement="right"
+      :width="280"
+    >
+      <AppMenu mode="inline" theme="light" @item-click="drawerOpen = false" />
+    </a-drawer>
+
+    <a-layout-content class="content">
       <div class="site-layout-content">
         <RouterView />
       </div>
     </a-layout-content>
     <a-layout-footer style="text-align: center">
-      Web Development ©2026 Created by Ibrahimcode18
+      Web API Development ©2026 Created by Me
     </a-layout-footer>
   </a-layout>
 </template>
 
 <style scoped>
+  .layout {
+    min-height: 100vh;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-inline: 16px;
+    overflow: hidden;
+  }
+
+  .logo {
+    flex-shrink: 1;
+    min-width: 0;
+    color: white;
+    font-size: clamp(0.95rem, 3.5vw, 1.5rem);
+    font-weight: bold;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .desktop-menu {
+    flex: 1;
+    min-width: 0;
+    justify-content: flex-end;
+  }
+
+  .mobile-menu-btn {
+    display: none;
+    color: #fff;
+    font-size: 22px;
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .mobile-menu-btn:hover,
+  .mobile-menu-btn:focus,
+  .mobile-menu-btn:active,
+  .mobile-menu-btn:focus-visible {
+    color: #fff !important;
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .mobile-menu-btn :deep(.anticon) {
+    color: inherit;
+  }
+
+  .content {
+    padding: 12px 12px 0;
+    margin-top: 8px;
+  }
 
   .site-layout-content {
     background: #fff;
-    padding: 24px;
+    padding: 16px;
     min-height: 280px;
-    margin-top: 24px;
+    margin-top: 8px;
+    overflow-x: auto;
   }
-  .logo {
-    float: left;
-    width: 300px;
-    height: 31px;
-    color: white;
-    font-size: 1.5rem;
-    font-weight: bold;
-    line-height: 64px; 
+
+  @media (min-width: 768px) {
+    .header {
+      padding-inline: 24px;
+    }
+
+    .content {
+      padding: 0 50px;
+      margin-top: 20px;
+    }
+
+    .site-layout-content {
+      padding: 24px;
+      margin-top: 24px;
+    }
   }
-  .router-link-active {
-    color: #ffffff !important;
-    font-weight: bold;
+
+  @media (max-width: 767px) {
+    .desktop-menu {
+      display: none;
+    }
+
+    .mobile-menu-btn {
+      display: inline-flex;
+    }
   }
 </style>
