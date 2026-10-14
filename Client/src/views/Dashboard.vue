@@ -1,6 +1,6 @@
 <template>
-    <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-        <h1 style="margin-bottom: 30px;">Admin Dashboard</h1>
+    <div class="dashboard">
+        <h1 class="dashboard-title">Admin Dashboard</h1>
 
         <div v-if="loading" style="text-align: center; margin-top: 50px;">
             <a-spin size="large" />
@@ -151,3 +151,21 @@
         }
     };
 </script>
+<style scoped>
+    .dashboard {
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+    }
+    .dashboard-title {
+        margin-bottom: 20px;
+        font-size: clamp(1.25rem, 4vw, 2rem);
+        word-break: break-word;
+    }
+    :deep(.ant-card) {
+        overflow-x: auto;
+    }
+    :deep(.ant-table) {
+        white-space: nowrap;
+    }
+</style>

@@ -4,7 +4,9 @@
             :dataSource="data" 
             :columns="columns" 
             rowKey="id" 
-            :pagination="{ pageSize: 5 }"
+            size="small"
+            :scroll="{ x: 'max-content' }"
+            :pagination="{ pageSize: 5, simple: true }"
         >
             <template #bodyCell="{ column, record }">
                 
