@@ -1,6 +1,10 @@
-require('dotenv').config();
-if (process.env.NODE_ENV === 'test') {
-    console.log(`TEST MODE DETECTED: Connecting to real_estate_test_db`);
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+
+const isTest = process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined;
+
+if (isTest) {
+    console.log(`TEST MODE DETECTED: Connecting to ${process.env.DB_NAME_TEST}`);
     exports.config = {
         host: "localhost",
         port: 3306,

@@ -3,7 +3,6 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const users = require('../models/users'); 
 
-// In a real app, this MUST be in a .env file!
 const secretKey = process.env.JWT_SECRET;
 
 const opts = {

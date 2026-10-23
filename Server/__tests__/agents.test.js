@@ -2,7 +2,7 @@ const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const app = require('../app'); 
 
-const JWT_SECRET = 'my_super_secure_secret_key_123'; 
+const JWT_SECRET = process.env.JWT_SECRET; 
 const generateToken = (payload) => jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
 describe('Agents API Endpoints', () => {

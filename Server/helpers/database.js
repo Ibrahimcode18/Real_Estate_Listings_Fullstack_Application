@@ -12,6 +12,8 @@ const poolConfig = {
 
 const pool = mysql.createPool(poolConfig);
 
+exports.pool = pool;
+
 exports.run_query = async function run_query(query, values) {
     try {
         const [data] = await pool.query(query, values);

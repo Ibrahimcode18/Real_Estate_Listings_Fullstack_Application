@@ -7,6 +7,12 @@
     "start": "node app.js",
     "test": "cross-env NODE_ENV=test jest --forceExit --runInBand"
   },
+  "jest": {
+    "testEnvironment": "node",
+    "maxWorkers": 1,
+    "setupFiles": ["<rootDir>/jest.setup.js"],
+    "setupFilesAfterEnv": ["<rootDir>/jest.reseed.js"]
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
